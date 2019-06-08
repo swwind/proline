@@ -9,7 +9,7 @@
       <router-link to="/" class="button">
         <i class="icon">home</i>
       </router-link>
-      <router-link to="/" class="button">
+      <router-link to="/download" class="button">
         <i class="icon">cloud_download</i>
       </router-link>
     </div>
@@ -154,6 +154,9 @@
     padding: 20px;
     transition: background-color .2s;
     cursor: pointer;
+    position: relative;
+    margin-bottom: 5px;
+    border-radius: 5px;
   }
   .list .item:hover {
     background-color: rgba(0, 0, 0, .05);
@@ -161,4 +164,22 @@
   .list .right {
     float: right;
   }
+
+  button {
+    background-color: #eeeeee;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 2px solid #eeeeee;
+    outline: none;
+    transition: all .3s;
+    cursor: pointer;
+    font-size: 18px;
+    margin: 10px 20px 10px 0;
+  }
+  button:hover {
+    background-color: white;
+    border: 2px solid #1479f7;
+  }
+
+  
 </style>

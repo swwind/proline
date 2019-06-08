@@ -7,27 +7,27 @@
     <div class="space"></div>
     <h2>Files</h2>
     <div class="file list">
-      <div v-if="!post.files.length" class="nothing">No files mounted</div>
-      <div v-for="(file, index) in post.files" class="item" :key="index">
+      <div v-if="!files.length" class="nothing">No files mounted</div>
+      <router-link v-for="(file, index) in files" class="item" :key="index"
+          :to="'/down/' + file.cid + '/' + file.fid">
         <span v-text="file.title"></span>
+        <span v-if="file.started" title="Downloaded">[*]</span>
         <span v-text="toSize(file.size)" class="right"></span>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
 
 <script>
-import { getPostInfo } from '../backend';
+import { getPostInfo, getFileStatus } from '../backend';
 import { toSize } from '../utils';
 export default {
   name: 'post-page',
   data() {
-    const post = getPostInfo(this.$route.params.cid, Number(this.$route.params.pubtime));
-    if (!post) {
-      throw new Error(JSON.stringify(this.$route.params));
-    }
+    const { cid, pubtime } = this.$route.params;
+    const post = getPostInfo(cid, Number(pubtime));
 
-    return { post };
+    return { post, files: post.files.map(getFileStatus.bind(null, cid)) };
   },
   methods: { toSize }
 }

@@ -21,6 +21,16 @@ export default new Router({
       component: require('@/components/PostPage').default
     },
     {
+      path: '/download',
+      name: 'download-page',
+      component: require('@/components/Download').default
+    },
+    {
+      path: '/down/:cid/:fid',
+      name: 'file-page',
+      component: require('@/components/FilePage').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

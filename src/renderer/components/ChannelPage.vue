@@ -1,11 +1,11 @@
 <template>
   <div class="chan">
     <h1 v-text="info.title"></h1>
-    <div v-text="info.chanid" class="id"></div>
+    <div v-text="info.cid" class="id"></div>
     <div class="post list">
       <div v-if="!posts.length" class="nothing">No posts published</div>
       <router-link v-for="(post, index) in posts" class="item" :class="{ unread: !post.read }" :key="index"
-          :to="'/post/' + info.chanid + '/' + post.pubtime">
+          :to="'/post/' + info.cid + '/' + post.pubtime">
         <span class="title h3" v-text="post.title"></span>
         <span class="right" v-text="(new Date(post.pubtime)).toLocaleDateString()"></span>
         <div class="content" v-text="post.content"></div>
