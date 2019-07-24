@@ -1,105 +1,73 @@
-const files = Object.create(null);
-const registerfile = (file) => {
-  files[file.cid + file.fid] = file;
-}
-const getfile = (cid, fid) => {
-  return files[cid + fid];
-}
+// 与 src/main/backend/index.js 进行交互
 
-registerfile({
-  title: '下载到一半.zip',
-  size: 155800020,
-  cid: 'a646e71efbba9a2c7f2c9f1c677e1a99',
-  fid: 'b2ee3095802e53f965e9848142f1fe92',
-  downloaded: 25800020,
-  started: true
-});
-registerfile({
-  title: '下载完了.zip',
-  size: 198484615,
-  cid: 'a646e71efbba9a2c7f2c9f1c677e1a99',
-  fid: '95802e53f965e984814b2ee302f1fe92',
-  downloaded: 198484615,
-  started: true
-});
-registerfile({
-  title: '刚开始下载.zip',
-  size: 2154679848,
-  cid: 'a646e71efbba9a2c7f2c9f1c677e1a99',
-  fid: '814b2ee309580965e9842e53f2f1fe92',
-  downloaded: 0,
-  started: true
-});
-registerfile({
-  title: '还没下载.zip',
-  size: 5541679848,
-  cid: 'a646e71efbba9a2c7f2c9f1c677e1a99',
-  fid: '4b2ee309580965e9842e53f2f181fe92',
-  downloaded: 0,
-  started: false
+import axios from 'axios';
+import Store from 'configstore';
+const store = new Store('proline-frontend', {
+  cname: { }, // Channel name
 });
 
-const channels = [{
-  title: '测试频道',
-  cid: 'a646e71efbba9a2c7f2c9f1c677e1a99',
-  posts: [{
-    title: '还没阅读',
-    pubtime: 1558228415020,
-    content: '我永远喜欢艾拉',
-    files: [
-      'b2ee3095802e53f965e9848142f1fe92',
-      '95802e53f965e984814b2ee302f1fe92',
-      '814b2ee309580965e9842e53f2f1fe92',
-      '4b2ee309580965e9842e53f2f181fe92'
-    ],
-    read: false
-  }, {
-    title: '已经阅读',
-    pubtime: 1548227405020,
-    content: '我永远喜欢艾米莉亚',
-    files: [ ],
-    read: true
-  }, {
-    title: '又一篇已经阅读',
-    pubtime: 848227405020,
-    content: '我永远喜欢怀特·天真·加百利',
-    files: [ ],
-    read: true
-  }]
-}, {
-  title: '没有帖子的频道',
-  cid: '095802e53f965e984814b2ee32f1fe92',
-  posts: [ ]
-}];
+const axs = axios.create({
+  baseURL: 'http://localhost:15884',
+  maxRedirects: 0,
+  validateStatus: () => true
+});
 
-export const getChannelList = () => {
-  return channels.map((chan) => {
-    return {
-      title: chan.title,
-      cid: chan.cid,
-      newpost: chan.posts.filter((p) => !p.read).length
-    }
-  });
-}
+/**
+ * 获取文章列表
+ * @param {string} cid 频道
+ * @returns {[IPostSummary] | false} 结果
+ */
+export const getPostList = async (cid: string) => {
+  const response = await axs.get('/postlist', { params: { cid } });
 
-export const getChannelInfo = (cid) => {
-  return channels.filter((c) => c.cid === cid)[0];
-}
+  return response.status === 200 && response.data;
+};
 
-export const getPostList = (cid) => {
-  return channels.filter((c) => c.cid === cid)[0].posts;
-}
+/**
+ * 获取文章信息
+ * @param {string} cid 频道
+ * @param {string} pid 文章
+ * @returns {IPostInfo | false} 结果
+ */
+export const getPostInfo = async (cid: string, pid: string) => {
+  const response = await axs.get('/postinfo', { params: { cid, pid } });
 
-export const getPostInfo = (cid, pid) => {
-  return getPostList(cid).filter((p) => p.pubtime === pid)[0];
-}
+  return response.status === 200 && response.data;
+};
 
-export const getDownloadList = () => {
-  return [
-    'b2ee3095802e53f965e9848142f1fe92',
-    '95802e53f965e984814b2ee302f1fe92',
-    '814b2ee309580965e9842e53f2f1fe92'
-  ].map((fid) => getfile('a646e71efbba9a2c7f2c9f1c677e1a99', fid));
-}
+/**
+ * 订阅频道
+ * @param {string} cid 频道
+ * @returns {true | string} 成功或者异常
+ */
+export const subscribeChannel = async (cid: string, cname: string) => {
+  store.set(`cname.${cid}`, cname);
+  const response = await axs.get('/subscribe', { params: { cid } });
 
-export const getFileStatus = getfile;
+  return response.status === 200 || response.data as string;
+};
+
+/**
+ * 取消订阅频道
+ * @param {string} cid 频道
+ * @returns {boolean} 是否返回成功
+ */
+export const unsubscribeChannel = async (cid: string) => {
+  const response = await axs.get('/unsubscribe', { params: { cid } });
+
+  return response.status === 200;
+};
+
+export const getChannelName = (cid: string) => {
+  return store.get(`cname.${cid}`) as string;
+};
+
+/**
+ * 获取订阅列表
+ * @returns {string[]} 一个列表
+ */
+export const getSubscribedChannelList = async () => {
+  const response = await axs.get('/sublist');
+
+  return response.status === 200 && response.data;
+};

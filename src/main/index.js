@@ -1,6 +1,6 @@
 
 
-import { BrowserWindow, app } from 'electron'
+import { BrowserWindow, app } from 'electron';
 
 /**
  * Set `__static` path to static files in production
@@ -8,14 +8,17 @@ import { BrowserWindow, app } from 'electron'
  */
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static')
-    .replace(/\\/g, '\\\\')
+    .replace(/\\/g, '\\\\');
 }
 
-let mainWindow
+let mainWindow;
 const winURL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:9080'
-  : `file://${__dirname}/index.html`
+  : `file://${__dirname}/index.html`;
 
+/**
+ * 我怎么知道这个是干什么用的
+ */
 function createWindow() {
 
   /**
@@ -25,28 +28,28 @@ function createWindow() {
     height: 563,
     useContentSize: true,
     width: 1000
-  })
+  });
 
-  mainWindow.loadURL(winURL)
+  mainWindow.loadURL(winURL);
 
   mainWindow.on('closed', () => {
-    mainWindow = null
-  })
+    mainWindow = null;
+  });
 }
 
-app.on('ready', createWindow)
+app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
+});
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    createWindow()
+    createWindow();
   }
-})
+});
 
 /**
  * Auto Updater
@@ -63,3 +66,5 @@ app.on('activate', () => {
 // app.on('ready', () => {
 // if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 // })
+
+require('./backend');

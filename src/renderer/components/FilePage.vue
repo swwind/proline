@@ -1,6 +1,6 @@
 <template>
   <div class="download">
-    <h1 v-text="file.title"></h1>
+    <!-- <h1 v-text="file.title"></h1>
     <div class="id" v-text="file.fid + '(from ' + chan.title + ')'"></div>
 
     <div class="progressbar">
@@ -13,11 +13,12 @@
     <button @click="openFile(file.localpath)" v-if="file.downloaded === file.size">
       <i class="icon">open_in_new</i>
       View in file manager
-    </button>
+    </button> -->
   </div>
 </template>
 
 <script>
+/*
 import { getFileStatus, getChannelInfo } from '../backend';
 import { toSize } from '../utils';
 import { shell } from 'electron';
@@ -35,6 +36,7 @@ export default {
     }
   }
 }
+*/
 </script>
 
 <style>

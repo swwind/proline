@@ -1,29 +1,43 @@
+<!-- 显示频道内的文章列表 -->
+
 <template>
   <div class="chan">
-    <h1 v-text="info.title"></h1>
-    <div v-text="info.cid" class="id"></div>
-    <div class="post list">
-      <div v-if="!posts.length" class="nothing">No posts published</div>
-      <router-link v-for="(post, index) in posts" class="item" :class="{ unread: !post.read }" :key="index"
-          :to="'/post/' + info.cid + '/' + post.pubtime">
-        <span class="title h3" v-text="post.title"></span>
-        <span class="right" v-text="(new Date(post.pubtime)).toLocaleDateString()"></span>
-        <div class="content" v-text="post.content"></div>
-      </router-link>
+    <div class="loading" v-if="error" v-text="error"></div>
+    <div v-if="!error && posts">
+      <h1 v-text="title"></h1>
+      <div v-text="cid" class="id"></div>
+      <div class="post list">
+        <div v-if="!posts.length" class="nothing">No posts published</div>
+        <router-link v-for="(post, index) in posts" class="item" :class="{ unread: !post.read }" :key="index"
+            :to="'/post/' + cid + '/' + post.pubtime">
+          <span class="title h3" v-text="post.title"></span>
+          <span class="right" v-text="(new Date(post.pubtime)).toLocaleDateString()"></span>
+          <div class="content" v-text="post.content"></div>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { getChannelInfo, getPostList } from '../backend';
+import { getPostList } from '../backend';
 export default {
   name: 'chan-page',
   data() {
     const cid = this.$route.params.cid;
+    getPostList(cid).then((posts) => {
+      if (!posts) {
+        this.error = 'Error...';
+      } else {
+        this.error = null;
+        this.posts = posts;
+      }
+    })
 
     return {
-      info: getChannelInfo(cid),
-      posts: getPostList(cid)
+      error: 'Loading...',
+      title: '萨格尔王',
+      posts: null,
     }
   }
 }

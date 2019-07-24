@@ -1,7 +1,7 @@
 <template>
   <div class="download">
     <h1>Downloads</h1>
-    <div class="list">
+    <!-- <div class="list">
       <div v-if="!fs.length" class="nothing">No downloaded files</div>
       <router-link v-for="(file, index) in fs" class="item" :key="index"
           :to="'/down/' + file.cid + '/' + file.fid">
@@ -13,11 +13,12 @@
         <span v-if="file.downloaded === file.size" class="right"
             v-text="toSize(file.size)"></span>
       </router-link>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
+/*
 import { getDownloadList } from '../backend';
 import { toSize } from '../utils';
 export default {
@@ -27,6 +28,7 @@ export default {
   },
   methods: { toSize }
 }
+*/
 </script>
 
 <style>

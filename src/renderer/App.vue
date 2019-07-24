@@ -143,7 +143,7 @@
   .list {
     margin: 50px 0;
   }
-  .list .nothing {
+  .list .nothing, .loading {
     text-align: center;
     color: grey;
   }
@@ -165,7 +165,7 @@
     float: right;
   }
 
-  button {
+  button, .real-button {
     background-color: #eeeeee;
     padding: 10px 20px;
     border-radius: 5px;
@@ -175,11 +175,29 @@
     cursor: pointer;
     font-size: 18px;
     margin: 10px 20px 10px 0;
+    text-decoration: none;
+    color: black;
   }
-  button:hover {
+  button:hover, .real-button:hover {
     background-color: white;
     border: 2px solid #1479f7;
   }
 
+  .input-text {
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid #eeeeee;;
+    outline: none;
+    width: 50%;
+    margin: 10px 0;
+    transition: all .3s;
+  }
+  .input-text:hover {
+    border-color: #cccccc;
+  }
+  .input-text:focus {
+    border-color: #1479f7;
+  }
   
 </style>

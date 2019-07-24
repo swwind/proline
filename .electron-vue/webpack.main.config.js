@@ -34,6 +34,11 @@ let mainConfig = {
         exclude: /node_modules/
       },
       {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        loader: 'ts-loader'
+      },
+      {
         test: /\.node$/,
         use: 'node-loader'
       }
@@ -52,7 +57,7 @@ let mainConfig = {
     new webpack.NoEmitOnErrorsPlugin()
   ],
   resolve: {
-    extensions: ['.js', '.json', '.node']
+    extensions: ['.js', '.json', '.node', '.ts']
   },
   target: 'electron-main'
 }

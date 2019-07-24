@@ -1,4 +1,6 @@
-export const toSize = (size) => {
+
+
+export const toReadableSize = (size) => {
   const b = size;
   const kb = b / 1024;
   const mb = kb / 1024;
@@ -22,5 +24,5 @@ export const toSize = (size) => {
     return `${kb.toFixed(2)} KB`;
   }
 
-  return `${b.toFixed(2)} B`;
-}
+  return `${b} B`;
+};
