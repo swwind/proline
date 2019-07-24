@@ -24,7 +24,7 @@ export default Vue.extend({
     const { cid, pid } = this.$route.params;
     return {
       error: 'Loading...',
-      title: 'Fetching post infomations...',
+      title: 'Loading...',
       post: null,
     };
   },
@@ -32,8 +32,8 @@ export default Vue.extend({
     const { cid, pid } = this.$route.params;
     const post = await getPostInfo(cid, pid);
     if (!post) {
-      this.error = null;
-      this.title = 'There is nobody who can tell you anything about this post';
+      this.error = 'Please review this page a few moments later';
+      this.title = 'Post not found';
     } else {
       this.error = null;
       this.post = post;

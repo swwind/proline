@@ -2,8 +2,10 @@
 
 import Koa from 'koa';
 import Router from 'koa-router';
-import { Posts, server } from '../core';
+import { Posts, server, Encrypt } from '../core';
 import logger from 'koa-logger';
+import bodyParser from 'koa-bodyparser';
+import { key2string } from '../core/encrypt';
 
 const app = new Koa();
 const router = new Router();
@@ -41,7 +43,7 @@ router.get('/postlist', async (ctx) => {
     ctx.response.status = 200;
     ctx.response.body = result;
   } else {
-    ctx.response.status = 404;
+    return ctx.throw(404);
   }
 });
 
@@ -53,8 +55,26 @@ router.get('/postinfo', async (ctx) => {
     ctx.response.status = 200;
     ctx.response.body = result;
   } else {
-    ctx.response.status = 404;
+    return ctx.throw(404);
   }
+});
+
+// 生成随机频道秘钥
+router.get('/generatekey', async (ctx) => {
+  const result = await Encrypt.generateKeyPair();
+
+  ctx.response.status = 200;
+  ctx.response.body = {
+    publicKey: key2string(result.publicKey),
+    privateKey: key2string(result.privateKey),
+  };
+});
+
+// 注册新频道
+router.post('/regester-publickey', async (ctx) => {
+  const { publicKey } = ctx.request.body;
+
+  Posts.registerPublicKey(publicKey);
 });
 
 app.use(async (ctx, next) => {
@@ -69,6 +89,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(logger());
 }
 
+app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
 // 本地端口

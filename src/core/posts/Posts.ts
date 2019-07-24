@@ -1,7 +1,7 @@
 import * as Store from 'configstore';
 import { IPostInfo, IPostSummary } from '../types';
 import Peers from '../peers/Peers';
-import { string2pubkey, verifyPostInfo, verifyPublicKey } from '../encrypt';
+import { string2pubkey, verifyPostInfo, verifyPublicKey, generateChannelID } from '../encrypt';
 import * as hash from 'object-hash';
 import * as R from 'ramda';
 
@@ -147,5 +147,13 @@ export default class Posts {
     const list: IPostSummary[] = store.get(`postlist.${cid}`) || [];
     list.push(summary);
     store.set(`postlist.${cid}`, list);
+  }
+
+  /**
+   * 注册公钥
+   */
+  public static registerPublicKey(publicKey: string) {
+    const cid = generateChannelID(publicKey);
+    store.set(`publickey.${cid}`, publicKey);
   }
 }

@@ -29,6 +29,14 @@ export default new Router({
     name: 'file-page',
     component: require('@/components/FilePage').default
   }, {
+    path: '/publish',
+    name: 'publish-home',
+    component: require('@/components/publish/Home').default
+  }, {
+    path: '/create-chan',
+    name: 'create-chan',
+    component: require('@/components/publish/Create').default
+  }, {
     path: '*',
     redirect: '/'
   }]

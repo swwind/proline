@@ -5,14 +5,16 @@ import Store from 'configstore';
 import { IPostSummary, IPostInfo } from '../core/types';
 
 const store = new Store('proline-frontend', {
-  cname: { }, // Channel name
+  cname: { }, // cname[cid]
   read: { }, // read[cid][pid]
+  publish: [ ], // [cid]
+  privatekey: { }, // privatekey[cid]
 });
 
 const axs = axios.create({
   baseURL: 'http://[::1]:15884',
   maxRedirects: 0,
-  validateStatus: () => true
+  validateStatus: () => true,
 });
 
 /**
@@ -86,8 +88,48 @@ export const markPostRead = (cid: string, pid: string) => {
  * 获取订阅列表
  * @returns {string[]} 一个列表
  */
-export const getSubscribedChannelList = async () => {
+export const getSubscribedChannelList = async (): Promise<string> => {
   const response = await axs.get('/sublist');
 
-  return response.status === 200 && response.data;
+  return response.status === 200 ? response.data : null;
+};
+
+declare interface IKeyPair {
+  publicKey: string;
+  privateKey: string;
+}
+
+/**
+ * 创建一对秘钥
+ */
+export const generateNewKey = async (): Promise<IKeyPair> => {
+  const response = await axs.get('/generatekey');
+
+  return response.status === 200 ? response.data : null;
+};
+
+/**
+ * 获取发布频道列表
+ */
+export const getCreatedChannelList = (): string[] => {
+  return store.get('publish') as string[];
+};
+
+/**
+ * 注册公钥
+ */
+export const registerPublicKey = async (publicKey: string) => {
+  const response = await axs.post('/regester-publickey', { publicKey });
+
+  return response.status === 200;
+};
+
+/**
+ * 注册新的私钥
+ */
+export const registerPrivateKey = (cid: string, privateKey: string) => {
+  store.set(`privatekey.${cid}`, privateKey);
+  const publish = store.get('publish') as string[];
+  publish.push(cid);
+  store.set('publish', publish);
 };

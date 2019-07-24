@@ -6,11 +6,14 @@
       </transition>
     </div>
     <div class="leftnav">
-      <router-link to="/" class="button">
+      <router-link to="/" class="button" title="Home">
         <i class="icon">home</i>
       </router-link>
-      <router-link to="/download" class="button">
+      <router-link to="/download" class="button" title="Downloads">
         <i class="icon">cloud_download</i>
+      </router-link>
+      <router-link to="/publish" class="button" title="Publish">
+        <i class="icon">create</i>
       </router-link>
     </div>
     <div class="start-animation"></div>
@@ -22,132 +25,135 @@
   export default { name: 'proline-frontend' }
 </script>
 
-<style>
-  body, html {
-    margin: 0;
-    padding: 0;
+<style lang="scss">
 
-    font-family: 'WenQuanYi Micro Hei', 'WenQuanYi Zen Hei', 'Microsoft Yahei', sans-serif;
-  }
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'WenQuanYi Zen Hei', 'WenQuanYi Micro Hei', 'Microsoft Yahei', sans-serif;
+}
 
-  .leftnav .button {
-    display: block;
-    height: 75px;
-    width: 75px;
-    text-align: center;
-    color: white;
-    transition: background-color .5s;
-  }
-  .leftnav .button .icon {
+.leftnav .button {
+  display: block;
+  height: 75px;
+  width: 75px;
+  text-align: center;
+  color: white;
+  transition: background-color .5s;
+
+  .icon {
     font-size: 40px;
     line-height: 75px;
   }
-  .leftnav .button:hover {
+
+  &:hover {
     background-color: rgba(255, 255, 255, .2);
   }
+}
 
-  #app {
-    display: block;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-  }
+#app {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
 
-  @keyframes start-animation {
-    to {
-      width: 0px;
-    }
+@keyframes start-animation {
+  to {
+    width: 0px;
   }
-
-  .start-animation {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #1479f7;
-    transition: background-color 1s;
-    animation: start-animation 1s;
-    animation-delay: 1s;
-    animation-fill-mode: forwards;
-  }
-  @keyframes fade-out {
-    to {
-      opacity: 0;
-      visibility: hidden;
-    }
-  }
-
-  .logo {
-    position: fixed;
-    top: 50%;
-    left: 0;
-    margin-top: -50px;
-    height: 100px;
-    width: 100%;
-    line-height: 100px;
-    color: white;
-    text-align: center;
-    font-size: 100px;
-    animation: fade-out 1s;
-    animation-delay: 1s;
-    animation-fill-mode: forwards;
-  }
-
-  .slide-fade-enter-active {
-    transition: all .5s ease;
-  }
-  .slide-fade-enter {
-    transform: translateX(10px);
+}
+@keyframes fade-out {
+  to {
     opacity: 0;
+    visibility: hidden;
   }
+}
 
-  h1, h2, h3, .h1, .h2, .h3 {
-    font-weight: normal;
-  }
-  h1, .h1 {
-    font-size: 36px;
-  }
-  h2, .h2 {
-    font-size: 30px;
-  }
-  h3, .h3 {
-    font-size: 24px;
-  }
+.start-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #1479f7;
+  transition: background-color 1s;
+  animation: start-animation 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
 
-  .leftnav {
-    display: block;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: 75px;
-    background-color: #1479f7;
-  }
+.logo {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  margin-top: -50px;
+  height: 100px;
+  width: 100%;
+  line-height: 100px;
+  color: white;
+  text-align: center;
+  font-size: 100px;
+  animation: fade-out 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
 
-  .container {
-    display: block;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+.slide-fade-enter-active {
+  transition: all .5s ease;
+}
+.slide-fade-enter {
+  transform: translateX(10px);
+  opacity: 0;
+}
 
-    padding: 25px;
-    padding-left: 100px;
-    box-sizing: border-box;
-  }
+h1, h2, h3, .h1, .h2, .h3 {
+  font-weight: normal;
+}
+h1, .h1 {
+  font-size: 36px;
+}
+h2, .h2 {
+  font-size: 30px;
+}
+h3, .h3 {
+  font-size: 24px;
+}
 
-  .list {
-    margin: 50px 0;
-  }
-  .list .nothing, .loading {
+.leftnav {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 75px;
+  background-color: #1479f7;
+}
+
+.container {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding: 25px;
+  padding-left: 100px;
+  box-sizing: border-box;
+}
+
+.list {
+  margin: 50px 0;
+
+  .nothing, .loading {
     text-align: center;
     color: grey;
   }
-  .list .item {
+
+  .item {
     display: block;
     color: black;
     text-decoration: none;
@@ -157,54 +163,62 @@
     position: relative;
     margin-bottom: 5px;
     border-radius: 5px;
-  }
-  .list .item:hover {
-    background-color: rgba(0, 0, 0, .05);
-  }
-  .list .right {
-    float: right;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, .05);
+    }
   }
 
-  button, .real-button, .radius-button {
-    background-color: #eeeeee;
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: 2px solid #eeeeee;
-    outline: none;
-    transition: all .3s;
-    cursor: pointer;
-    font-size: 18px;
-    margin: 10px 20px 10px 0;
-    text-decoration: none;
-    color: black;
+  .right {
+    float: right;
   }
-  .radius-button {
-    padding: 10px;
-    border-radius: 50%;
-  }
-  button:hover, .real-button:hover, .radius-button:hover {
+}
+
+button, .real-button, .radius-button {
+  background-color: #eeeeee;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 2px solid #eeeeee;
+  outline: none;
+  transition: all .3s;
+  cursor: pointer;
+  font-size: 18px;
+  margin: 10px 20px 10px 0;
+  text-decoration: none;
+  color: black;
+
+  &:hover {
     background-color: white;
     border: 2px solid #1479f7;
   }
-  button:focus, .real-button:focus, .radius-button:focus {
+
+  &:focus {
     border: 2px solid #1479f7;
   }
+}
 
-  .input-text {
-    font-size: 18px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 2px solid #eeeeee;;
-    outline: none;
-    width: 50%;
-    margin: 10px 0;
-    transition: all .3s;
-  }
-  .input-text:hover {
+.radius-button {
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.input-text {
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #eeeeee;;
+  outline: none;
+  width: 50%;
+  margin: 10px 0;
+  transition: all .3s;
+
+  &:hover {
     border-color: #cccccc;
   }
-  .input-text:focus {
+
+  &:focus {
     border-color: #1479f7;
   }
-  
+}
+
 </style>
