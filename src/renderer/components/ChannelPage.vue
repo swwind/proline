@@ -2,14 +2,14 @@
 
 <template>
   <div class="chan">
+    <h1 v-text="title"></h1>
     <div class="loading" v-if="error" v-text="error"></div>
     <div v-if="!error && posts">
-      <h1 v-text="title"></h1>
       <div v-text="cid" class="id"></div>
       <div class="post list">
         <div v-if="!posts.length" class="nothing">No posts published</div>
         <router-link v-for="(post, index) in posts" class="item" :class="{ unread: !post.read }" :key="index"
-            :to="'/post/' + cid + '/' + post.pubtime">
+            :to="'/post/' + cid + '/' + post.pid">
           <span class="title h3" v-text="post.title"></span>
           <span class="right" v-text="(new Date(post.pubtime)).toLocaleDateString()"></span>
           <div class="content" v-text="post.content"></div>
@@ -20,25 +20,35 @@
 </template>
 
 <script>
-import { getPostList } from '../backend';
+import { getPostList, getChannelName, isPostRead } from '../backend';
 export default {
   name: 'chan-page',
   data() {
     const cid = this.$route.params.cid;
-    getPostList(cid).then((posts) => {
-      if (!posts) {
-        this.error = 'Error...';
-      } else {
-        this.error = null;
-        this.posts = posts;
-      }
-    })
-
     return {
+      cid,
       error: 'Loading...',
-      title: '萨格尔王',
+      title: getChannelName(cid),
       posts: null,
     }
+  },
+  async mounted() {
+    const cid = this.$route.params.cid;
+    const originPost = await getPostList(cid);
+    if (!originPost) {
+      this.error = 'An Error occurred';
+      return;
+    }
+
+    const posts = originPost.map((post) => {
+      return {
+        ...post,
+        read: isPostRead(cid, post.pid),
+      }
+    });
+
+    this.error = null;
+    this.posts = posts;
   }
 }
 </script>

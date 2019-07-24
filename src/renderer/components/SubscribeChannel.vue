@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <h1>Add Subscribe</h1>
+    <h1>Subscribe New Channel</h1>
     <input v-model="cid" type="text" placeholder="Channel ID (cid)" class="input-text">
     <input v-model="cname" type="text" placeholder="Channel Name" class="input-text">
     <div class="error" v-text="error"></div>
@@ -43,7 +43,8 @@ export default {
         if (typeof success === 'string') {
           throw new Error(success);
         } else {
-          console.log('fuck!fuck');
+          // success
+          window.location.href = '/#/';
         }
       } catch (e) {
         this.error = e.toString();

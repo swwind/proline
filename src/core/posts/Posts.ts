@@ -24,8 +24,7 @@ export default class Posts {
    * @param {KeyObject} 公钥
    */
   public static async getPublicKey(cid: string, online: RequestType = 'both') {
-    const storepath = ['publickey', cid].join('.');
-    const keystr = store.get(storepath) as string;
+    const keystr = store.get(`publickey.${cid}`) as string;
 
     if (online === 'local-only' || online === 'both' && keystr) {
       return keystr ? string2pubkey(keystr) : null;
@@ -35,7 +34,7 @@ export default class Posts {
 
     const result = fres.filter(verifyPublicKey.bind(null, cid))[0];
     if (result) {
-      store.set(storepath, result);
+      store.set(`publickey.${cid}`, result);
     }
 
     return result ? string2pubkey(result) : null;
@@ -90,8 +89,7 @@ export default class Posts {
    * @returns {IPostInfo} 结果
    */
   public static async getPostInfo(cid: string, pid: string, online: RequestType = 'both') {
-    const storepath = ['postinfo', cid, pid].join('.');
-    const localData = store.get(storepath) as IPostInfo || null;
+    const localData = store.get(`postinfo.${cid}.${pid}`) as IPostInfo || null;
 
     if (online === 'local-only' || online === 'both' && localData) {
       return localData;
@@ -102,7 +100,7 @@ export default class Posts {
 
     const result = fres.filter(verifyPostInfo.bind(null, publickey))[0] || null;
     if (result) {
-      store.set(storepath, result);
+      store.set(`postinfo.${cid}.${pid}`, result);
     }
 
     return result;
@@ -115,8 +113,7 @@ export default class Posts {
    * @param {boolean} online 是否离线
    */
   public static async getPostList(cid: string, online: RequestType = 'both') {
-    const storepath = ['postlist', cid].join('.');
-    const localData = store.get(storepath) as IPostSummary[];
+    const localData = store.get(`postlist.${cid}`) as IPostSummary[];
 
     if (online === 'local-only') {
       return localData;
@@ -128,7 +125,7 @@ export default class Posts {
     }
     const result = R.uniqBy(hash, R.flatten(fres.filter((c) => c !== null))) as IPostSummary[];
     result.sort((a, b) => a.pubtime - b.pubtime);
-    store.set(storepath, result);
+    store.set(`postlist.${cid}`, result);
 
     return result;
   }
@@ -137,7 +134,18 @@ export default class Posts {
    * 添加文章，需要预验证
    */
   public static addPost(cid: string, post: IPostInfo) {
-    const storepath = ['postinfo', cid, post.pid].join('.');
-    store.set(storepath, post);
+    store.set(`postinfo.${cid}.${post.pid}`, post);
+
+    // 保存到 summary 到 list
+
+    const summary: IPostSummary = {
+      pid: post.pid,
+      title: post.title,
+      pubtime: post.pubtime,
+    };
+
+    const list: IPostSummary[] = store.get(`postlist.${cid}`) || [];
+    list.push(summary);
+    store.set(`postlist.${cid}`, list);
   }
 }

@@ -1,6 +1,6 @@
 import * as hash from 'object-hash';
 import * as crypto from 'crypto';
-import R from 'ramda';
+import * as R from 'ramda';
 import { IPostInfo } from '../types';
 
 export const md5 = (buffer: Buffer) => {

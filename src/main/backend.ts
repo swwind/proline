@@ -57,6 +57,14 @@ router.get('/postinfo', async (ctx) => {
   }
 });
 
+app.use(async (ctx, next) => {
+  if (ctx.ip === '::1') {
+    await next();
+  } else {
+    ctx.throw(403);
+  }
+});
+
 if (process.env.NODE_ENV === 'development') {
   app.use(logger());
 }

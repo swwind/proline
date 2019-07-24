@@ -165,7 +165,7 @@
     float: right;
   }
 
-  button, .real-button {
+  button, .real-button, .radius-button {
     background-color: #eeeeee;
     padding: 10px 20px;
     border-radius: 5px;
@@ -178,8 +178,15 @@
     text-decoration: none;
     color: black;
   }
-  button:hover, .real-button:hover {
+  .radius-button {
+    padding: 10px;
+    border-radius: 50%;
+  }
+  button:hover, .real-button:hover, .radius-button:hover {
     background-color: white;
+    border: 2px solid #1479f7;
+  }
+  button:focus, .real-button:focus, .radius-button:focus {
     border: 2px solid #1479f7;
   }
 
