@@ -133,3 +133,25 @@ export const registerPrivateKey = (cid: string, privateKey: string) => {
   publish.push(cid);
   store.set('publish', publish);
 };
+
+/**
+ * 获取私钥
+ */
+export const getPrivateKey = (cid: string) => {
+  return store.get(`privatekey.${cid}`) as string;
+};
+
+/**
+ * 给文章签名
+ */
+export const signPost = async (post: IPostInfo, privateKey: string): Promise<IPostInfo> => {
+  const response = await axs.post('/signpost', { post, privateKey });
+
+  return response.status === 200 ? response.data : null;
+};
+
+export const publishPost = async (cid: string, post: IPostInfo) => {
+  const response = await axs.post('/publish', { cid, post });
+
+  return response.status === 200;
+};

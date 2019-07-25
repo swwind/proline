@@ -188,6 +188,7 @@ button, .real-button, .radius-button, .select {
   color: black;
 
   &:hover {
+    color: black;
     background-color: white;
     border: 2px solid #1479f7;
   }
@@ -201,6 +202,37 @@ button, .real-button, .radius-button, .select {
     border: 2px solid #eeeeee;
     background-color: #eeeeee;
     cursor: not-allowed;
+  }
+
+  &.green {
+    color: white;
+    background-color: #00da24;
+    border-color: #00da24;
+
+    &:hover, &:focus {
+      background-color: #eeeeee;
+      color: #00da24;
+    }
+  }
+
+  &.red {
+    color: white;
+    background-color: #ce0707;
+    border-color: #ce0707;
+
+    &:hover, &:focus {
+      background-color: #eeeeee;
+      color: #ce0707;
+    }
+  }
+
+  &.green, &.red {
+    &:disabled {
+      color: #666;
+      border: 2px solid #eeeeee;
+      background-color: #eeeeee;
+      cursor: not-allowed;
+    }
   }
 }
 
@@ -237,31 +269,6 @@ button, .real-button, .radius-button, .select {
 .small-setsumei {
   margin: 20px 0 10px;
   font-size: 18px;
-}
-
-.markdown-editor {
-  margin: 0;
-  height: 500px;
-  border: 2px solid #eeeeee;
-  border-radius: 5px;
-  color: #333;
-  display: flex;
-
-  textarea, .preview {
-    flex: 1;
-    padding: 0 20px;
-    overflow: auto;
-  }
-
-  textarea {
-    border: none;
-    resize: none;
-    outline: none;
-    background-color: #f6f6f6;
-    font-size: 16px;
-    font-family: 'Monaco', courier, monospace;
-    padding: 20px;
-  }
 }
 
 </style>

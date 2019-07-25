@@ -75,6 +75,26 @@ router.post('/regester-publickey', async (ctx) => {
   const { publicKey } = ctx.request.body;
 
   Posts.registerPublicKey(publicKey);
+
+  ctx.response.status = 200;
+});
+
+// 签名文章
+router.post('/signpost', async (ctx) => {
+  const { post, privateKey } = ctx.request.body;
+
+  post.signature = Encrypt.signPostInfo(Encrypt.string2prvkey(privateKey), post);
+
+  ctx.response.status = 200;
+  ctx.response.body = post;
+});
+
+// 发布文章
+router.post('/publish', async (ctx) => {
+  const { post, cid } = ctx.request.body;
+  Posts.addPost(cid, post);
+
+  ctx.response.status = 200;
 });
 
 app.use(async (ctx, next) => {
@@ -101,6 +121,6 @@ app.use(router.allowedMethods());
 // 本地端口
 app.listen(15884);
 // 开放端口
-server.listen(23333);
+server.listen(15468);
 
 export default true;

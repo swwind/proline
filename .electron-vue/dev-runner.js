@@ -131,7 +131,7 @@ const init = async () => {
     startRenderer(),
     startMain(),
   ]);
-  sta2rtElectron();
+  startElectron();
 }
 
 init();

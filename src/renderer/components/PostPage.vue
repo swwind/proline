@@ -6,7 +6,7 @@
     <div class="loading" v-if="error" v-text="error"></div>
     <div v-if="!error && post">
       <div v-text="(new Date(post.pubtime)).toLocaleDateString()" class="time"></div>
-      <div class="content" v-text="post.content"></div>
+      <div class="content" v-html="marked(post.content)"></div>
       <h2>Files</h2>
       <div>TODO</div>
     </div>
@@ -15,6 +15,7 @@
 
 <script>
 import { getPostInfo, markPostRead } from '../backend';
+import marked from 'marked';
 
 import Vue from 'vue';
 
@@ -40,6 +41,14 @@ export default Vue.extend({
       this.title = post.title;
 
       markPostRead(cid, pid);
+    }
+  },
+  methods: {
+    marked(text) {
+      return marked(text, {
+        sanitize: true,
+        silent: true,
+      });
     }
   }
 });
