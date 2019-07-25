@@ -3,10 +3,14 @@
 <template>
   <div>
     <h1>Subscribe New Channel</h1>
-    <input v-model="cid" type="text" placeholder="Channel ID (cid)" class="input-text">
-    <input v-model="cname" type="text" placeholder="Channel Name" class="input-text">
+    <div class="setsumei">
+      You need to provide Channel ID(cid) so as to subscribe a channel.
+      Name cound be whatever you want.
+    </div>
+    <input v-model="cid" type="text" placeholder="Channel ID (cid)" class="input-text" :disabled="disable">
+    <input v-model="cname" type="text" placeholder="Channel Name" class="input-text" :disabled="disable">
     <div class="error" v-text="error"></div>
-    <button @click="addChannel()">
+    <button @click="addChannel()" :disabled="disable">
       <i class="icon">add</i>
       Add Channel
     </button>
@@ -22,6 +26,7 @@ export default {
       error: '',
       cid: '',
       cname: '',
+      disable: false,
     }
   },
   methods: {
@@ -33,10 +38,13 @@ export default {
         return;
       }
 
+      this.error = 'Searching channel...';
+      this.disable = true;
+
       try {
         const chanlist = await getSubscribedChannelList();
         if (chanlist.indexOf(cid) > -1) {
-          this.error = 'Channel Already Subscribed';
+          throw new Error('Channel Already Subscribed');
           return;
         }
         const success = await subscribeChannel(cid, cname);
@@ -48,6 +56,7 @@ export default {
         }
       } catch (e) {
         this.error = e.toString();
+        this.disable = false;
         console.error(e);
       }
     }
@@ -58,5 +67,6 @@ export default {
 <style>
 .error {
   color: red;
+  height: 20px;
 }
 </style>

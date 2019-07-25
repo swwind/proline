@@ -137,8 +137,8 @@ h3, .h3 {
   top: 0;
   width: 100%;
   height: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   padding: 25px;
   padding-left: 100px;
@@ -174,7 +174,7 @@ h3, .h3 {
   }
 }
 
-button, .real-button, .radius-button {
+button, .real-button, .radius-button, .select {
   background-color: #eeeeee;
   padding: 10px 20px;
   border-radius: 5px;
@@ -195,6 +195,13 @@ button, .real-button, .radius-button {
   &:focus {
     border: 2px solid #1479f7;
   }
+
+  &:disabled {
+    color: #666;
+    border: 2px solid #eeeeee;
+    background-color: #eeeeee;
+    cursor: not-allowed;
+  }
 }
 
 .radius-button {
@@ -203,12 +210,14 @@ button, .real-button, .radius-button {
 }
 
 .input-text {
+  display: block;
   font-size: 18px;
   padding: 10px;
   border-radius: 5px;
-  border: 2px solid #eeeeee;;
+  border: 2px solid #eeeeee;
   outline: none;
-  width: 50%;
+  width: 100%;
+  box-sizing: border-box;
   margin: 10px 0;
   transition: all .3s;
 
@@ -218,6 +227,40 @@ button, .real-button, .radius-button {
 
   &:focus {
     border-color: #1479f7;
+  }
+}
+
+.setsumei {
+  margin: 20px 0;
+  font-size: 18px;
+}
+.small-setsumei {
+  margin: 20px 0 10px;
+  font-size: 18px;
+}
+
+.markdown-editor {
+  margin: 0;
+  height: 500px;
+  border: 2px solid #eeeeee;
+  border-radius: 5px;
+  color: #333;
+  display: flex;
+
+  textarea, .preview {
+    flex: 1;
+    padding: 0 20px;
+    overflow: auto;
+  }
+
+  textarea {
+    border: none;
+    resize: none;
+    outline: none;
+    background-color: #f6f6f6;
+    font-size: 16px;
+    font-family: 'Monaco', courier, monospace;
+    padding: 20px;
   }
 }
 

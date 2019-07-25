@@ -37,6 +37,10 @@ export default new Router({
     name: 'create-chan',
     component: require('@/components/publish/Create').default
   }, {
+    path: '/write-post',
+    name: 'write-post',
+    component: require('@/components/publish/WritePost').default
+  }, {
     path: '*',
     redirect: '/'
   }]

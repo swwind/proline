@@ -5,6 +5,9 @@
     <h1>Proline (ﾉ&gt;ω&lt;)ﾉ</h1>
     <div class="loading" v-if="error" v-text="error"></div>
     <div v-if="!error && chans">
+      <div class="setsumei">
+        Here are the channels you subscribed.
+      </div>
       <div class="main list">
         <div v-if="!chans.length" class="nothing">No channels subscribed</div>
         <router-link v-for="(chan, index) in chans" class="item" :key="index" :to="'/chan/' + chan.cid">
@@ -12,8 +15,9 @@
           <span class="right id" v-text="chan.cid"></span>
         </router-link>
       </div>
-      <router-link to="/subscribe-chan" class="radius-button">
+      <router-link to="/subscribe-chan" class="real-button">
         <i class="icon">add</i>
+        Subscribe Channel
       </router-link>
     </div>
   </div>

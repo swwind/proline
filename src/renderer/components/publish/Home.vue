@@ -5,6 +5,9 @@
     <h1>My Channels (,,・ω・,,)</h1>
     <div class="loading" v-if="error" v-text="error"></div>
     <div v-if="!error && chans">
+      <div class="setsumei">
+        Here are the channels you created.
+      </div>
       <div class="main list">
         <div v-if="!chans.length" class="nothing">No channels</div>
         <router-link v-for="(chan, index) in chans" class="item" :key="index" :to="'/chan/' + chan.cid">
@@ -12,8 +15,13 @@
           <span class="right id" v-text="chan.cid"></span>
         </router-link>
       </div>
-      <router-link to="/create-chan" class="radius-button">
+      <router-link to="/create-chan" class="real-button">
         <i class="icon">add</i>
+        Create A New Channel
+      </router-link>
+      <router-link to="/write-post" class="real-button">
+        <i class="icon">create</i>
+        Write A New Post
       </router-link>
     </div>
   </div>
