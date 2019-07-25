@@ -4,7 +4,7 @@ A decentrialized post subscriber and file downloader.
 
 ## TODO
 
-- [ ] fix build bug
+- [x] fix build bug
 - [ ] file sharing
 - [ ] file downloading
 - [ ] post publishing

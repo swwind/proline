@@ -6,8 +6,9 @@
   "license": "MIT",
   "main": "./dist/main.js",
   "scripts": {
-    "clean": "rm -rf ./dist",
-    "build": "yarn run clean && yarn run pack && electron-forge make",
+    "build": "yarn run pack && electron-builder -wl",
+    "build:linux": "yarn run pack && electron-builder --linux",
+    "build:win": "yarn run pack && electron-builder --win",
     "dev": "node .electron-vue/dev-runner.js",
     "lint": "eslint --ext .ts -f ./node_modules/eslint-friendly-formatter src",
     "lint:fix": "eslint --ext .ts -f ./node_modules/eslint-friendly-formatter --fix src",
@@ -16,18 +17,33 @@
     "pack:renderer": "webpack --progress --colors --config .electron-vue/webpack.renderer.config.js --mode=production",
     "postinstall": "yarn run lint:fix"
   },
-  "config": {
-    "forge": {
-      "makers": [
-        {
-          "name": "@electron-forge/maker-zip"
-        }
+  "build": {
+    "appId": "org.proline.desktop",
+    "productName": "proline",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
       ]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "build/icon.ico"
+    },
+    "electronDownload": {
+      "mirror": "https://npm.taobao.org/mirrors/electron/"
     }
   },
   "dependencies": {
     "axios": "^0.19.0",
     "configstore": "^5.0.0",
+    "electron-log": "^3.0.6",
     "eslint": "^6.1.0",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
@@ -71,6 +87,7 @@
     "devtron": "^1.4.0",
     "electron": "^5.0.8",
     "electron-builder": "^21.1.1",
+    "electron-builder-squirrel-windows": "^21.1.5",
     "electron-debug": "^3.0.1",
     "electron-devtools-installer": "^2.2.4",
     "eslint-config-standard": "^11.0.0",

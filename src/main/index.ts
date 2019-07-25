@@ -1,14 +1,16 @@
 
-
 import { BrowserWindow, app } from 'electron';
+import log from 'electron-log';
 
 let mainWindow;
-const winURL = process.env.NODE_ENV === 'development'
+const winURL = process.env.NODE_ENV !== 'production'
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`;
 
+log.log(`open URL: ${winURL}`);
+
 /**
- * 我怎么知道这个是干什么用的
+ * create window
  */
 function createWindow() {
 
@@ -29,6 +31,8 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  log.log('main window created');
 }
 
 app.on('ready', createWindow);

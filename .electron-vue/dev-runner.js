@@ -9,36 +9,20 @@ const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
 const webpackHotMiddleware = require('webpack-hot-middleware')
 
-const mainConfig = require('./webpack.main.config')
-const rendererConfig = require('./webpack.renderer.config')
+const mainConfig = require('./webpack.main.config')(null, { mode: 'development' })
+const rendererConfig = require('./webpack.renderer.config')(null, { mode: 'development' })
 
 let electronProcess = null
 let manualRestart = false
 let hotMiddleware
 
-function logStats (proc, data) {
-  let log = ''
-
-  log += chalk.yellow.bold(`┏ ${proc} Process ${new Array((19 - proc.length) + 1).join('-')}`)
-  log += '\n\n'
-
-  if (typeof data === 'object') {
-    data.toString({
-      colors: true,
-      chunks: false
-    }).split(/\r?\n/).forEach(line => {
-      log += '  ' + line + '\n'
-    })
-  } else {
-    log += `  ${data}\n`
-  }
-
-  log += '\n' + chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`) + '\n'
-
-  console.log(log)
+const logStats = (proc, data) => {
+  console.log(`[${proc}] ${data.toString({
+    colors: true
+  })}`);
 }
 
-function startRenderer () {
+const startRenderer = () => {
   return new Promise((resolve, reject) => {
     rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer)
     rendererConfig.mode = 'development'
@@ -77,9 +61,8 @@ function startRenderer () {
   })
 }
 
-function startMain () {
+const startMain = () => {
   return new Promise((resolve, reject) => {
-    mainConfig.entry.main = [path.join(__dirname, '../src/main/index.dev.ts')].concat(mainConfig.entry.main)
     mainConfig.mode = 'development'
     const compiler = webpack(mainConfig)
 
@@ -113,7 +96,7 @@ function startMain () {
   })
 }
 
-function startElectron () {
+const startElectron = () => {
   var args = [
     '--inspect=5858',
     path.join(__dirname, '../dist/main.js')
@@ -129,10 +112,10 @@ function startElectron () {
   electronProcess = spawn(electron, args)
   
   electronProcess.stdout.on('data', data => {
-    electronLog(data, 'blue')
+    console.log(data.toString());
   })
   electronProcess.stderr.on('data', data => {
-    electronLog(data, 'red')
+    console.error(data.toString());
   })
 
   electronProcess.on('close', () => {
@@ -140,51 +123,15 @@ function startElectron () {
   })
 }
 
-function electronLog (data, color) {
-  let log = ''
-  data = data.toString().split(/\r?\n/)
-  data.forEach(line => {
-    log += `  ${line}\n`
-  })
-  if (/[0-9A-z]+/.test(log)) {
-    console.log(
-      chalk[color].bold('┏ Electron -------------------') +
-      '\n\n' +
-      log +
-      chalk[color].bold('┗ ----------------------------') +
-      '\n'
-    )
-  }
+const init = async () => {
+
+  console.log('waiting...');
+
+  await Promise.all([
+    startRenderer(),
+    startMain(),
+  ]);
+  sta2rtElectron();
 }
 
-function greeting () {
-  const cols = process.stdout.columns
-  let text = ''
-
-  if (cols > 104) text = 'electron-vue'
-  else if (cols > 76) text = 'electron-|vue'
-  else text = false
-
-  if (text) {
-    say(text, {
-      colors: ['yellow'],
-      font: 'simple3d',
-      space: false
-    })
-  } else console.log(chalk.yellow.bold('\n  electron-vue'))
-  console.log(chalk.blue('  getting ready...') + '\n')
-}
-
-function init () {
-  greeting()
-
-  Promise.all([startRenderer(), startMain()])
-    .then(() => {
-      startElectron()
-    })
-    .catch(err => {
-      console.error(err)
-    })
-}
-
-init()
+init();
