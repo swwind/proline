@@ -1,5 +1,15 @@
 # Proline
 
-Proline is just poline. I love Emilia forever.
+A decentrialized post subscriber and file downloader.
 
-Emiliatan Maji Tenshi!!!
+## TODO
+
+- [ ] fix build bug
+- [ ] file sharing
+- [ ] file downloading
+- [ ] post publishing
+- [ ] mime and protocol
+
+## See Also
+
+[timber3252/omelet](https://github.com/timber3252/omelet)

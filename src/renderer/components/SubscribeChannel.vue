@@ -4,7 +4,7 @@
   <div>
     <h1>Subscribe New Channel</h1>
     <div class="setsumei">
-      You need to provide Channel ID(cid) so as to subscribe a channel.
+      You need to provide Channel ID(cid) so as to subscribe a channel. <br>
       Name cound be whatever you want.
     </div>
     <input v-model="cid" type="text" placeholder="Channel ID (cid)" class="input-text" :disabled="disable">

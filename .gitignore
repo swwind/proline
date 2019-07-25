@@ -1,6 +1,5 @@
 .DS_Store
-dist/electron/*
-dist/web/*
+dist/
 build/*
 !build/icons
 node_modules/
@@ -11,3 +10,4 @@ thumbs.db
 !.gitkeep
 package-lock.json
 yarn.lock
+out/
