@@ -127,7 +127,7 @@ export default {
         pid,
         title,
         content,
-        files: [], // TODO
+        files: [], // TODO: FILE
         pubtime: Date.now(),
         signature: '',
       }, privateKey);

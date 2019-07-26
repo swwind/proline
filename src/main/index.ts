@@ -65,4 +65,8 @@ app.on('activate', () => {
 // if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 // })
 
-require('./backend');
+import './backend';
+import Omelet from './omelet';
+
+/* eslint-disable-next-line */
+new Omelet('47.103.116.110:21121');

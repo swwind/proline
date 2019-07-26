@@ -7,7 +7,7 @@ A decentrialized post subscriber and file downloader.
 - [x] fix build bug
 - [ ] file sharing
 - [ ] file downloading
-- [ ] post publishing
+- [x] post publishing
 - [ ] mime and protocol
 
 ## See Also
