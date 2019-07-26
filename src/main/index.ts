@@ -66,7 +66,6 @@ app.on('activate', () => {
 // })
 
 import './backend';
-import Omelet from './omelet';
+import omelet from './omelet';
 
-/* eslint-disable-next-line */
-new Omelet('47.103.116.110:21121');
+omelet('47.103.116.110:21121');
