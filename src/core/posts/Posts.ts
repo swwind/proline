@@ -123,7 +123,7 @@ export default class Posts {
     if (localData) {
       fres.push(localData);
     }
-    const result = R.uniqBy(hash, R.flatten(fres.filter((c) => c !== null))) as IPostSummary[];
+    const result = R.uniqBy(hash, R.flatten(fres.filter(Boolean))) as IPostSummary[];
     result.sort((a, b) => a.pubtime - b.pubtime);
     store.set(`postlist.${cid}`, result);
 

@@ -1,25 +1,14 @@
-import { Address6 } from 'ip-address';
 import { AxiosInstance } from 'axios';
 import client from '../network/client';
 import { IPostInfo, IPostSummary } from '../types';
 
 export default class Peer {
   public ipv6: string;
-
   public port: number;
-
   public axios: AxiosInstance;
 
   public constructor(ipv6: string, port: number) {
-    const ip = new Address6(ipv6);
-    if (!ip.isValid()) {
-      throw new Error(`bad ipv6 address: ${ipv6}`);
-    }
-    this.ipv6 = ip.canonicalForm();
-
-    if (port < 20000 || port > 40000) {
-      throw new Error(`bad port(20k-40k): ${port}`);
-    }
+    this.ipv6 = ipv6;
     this.port = port;
 
     this.axios = client(this.ipv6, this.port);

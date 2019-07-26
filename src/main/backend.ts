@@ -118,9 +118,9 @@ app.use(async (ctx, next) => {
 app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
-// 本地端口
+// 本地服务端口
 app.listen(15884);
-// 开放端口
-server.listen(15468);
+// 开放外网端口
+server.listen(25468);
 
 export default true;

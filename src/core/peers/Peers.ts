@@ -1,17 +1,28 @@
 import Peer from './Peer';
+import log from 'electron-log';
 
 /**
  * 集中管理 Peer
  */
 export default class Peers {
   private static prs: Set<Peer> = new Set();
+  private static map: Map<string, Peer> = new Map();
 
-  public static addPeer(pr: Peer) {
-    this.prs.add(pr);
+  public static addPeer(ip: string) {
+    log.log(`Add Peer: ${ip}`);
+    const peer = new Peer(ip, 25468);
+    this.prs.add(peer);
+    this.map.set(ip, peer);
   }
 
-  public static removePeer(pr: Peer) {
-    return this.prs.delete(pr);
+  public static removePeer(ip: string) {
+    log.log(`Remove Peer: ${ip}`);
+    const peer = this.map.get(ip);
+    if (!peer) {
+      return;
+    }
+    this.prs.delete(peer);
+    this.map.delete(ip);
   }
 
   /**
@@ -25,6 +36,21 @@ export default class Peers {
     });
 
     return Promise.all(ps);
+  }
+
+  public static updateIPs(ips: Set<string>) {
+    for (const ip of ips) {
+      if (!this.map.has(ip)) {
+        // 新人
+        this.addPeer(ip);
+      }
+    }
+    for (const ip of this.map.keys()) {
+      if (!ips.has(ip)) {
+        // 离开
+        this.removePeer(ip);
+      }
+    }
   }
 
 }

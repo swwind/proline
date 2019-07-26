@@ -66,6 +66,6 @@ app.on('activate', () => {
 // })
 
 import './backend';
-import omelet from './omelet';
 
+import omelet from './omelet';
 omelet('47.103.116.110:21121');

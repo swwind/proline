@@ -90,7 +90,7 @@
       "error",
       "beside"
     ],
-    "indent": ["error", 2],
+    "indent": "off",
     "indent-legacy": "off",
     "init-declarations": "off",
     "jsx-quotes": "error",
@@ -109,7 +109,7 @@
     ],
     "lines-around-comment": "error",
     "lines-around-directive": "error",
-    "lines-between-class-members": "error",
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "max-classes-per-file": "off",
     "max-depth": "error",
     "max-len": "off",

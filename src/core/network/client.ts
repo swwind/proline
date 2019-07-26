@@ -2,8 +2,9 @@ import axios from 'axios';
 
 export default (ipv6: string, port: number) => {
 
+  // TODO: still ipv4
   const axs = axios.create({
-    baseURL: `http://[${ipv6}]:${port}/api/v1`,
+    baseURL: `http://${ipv6}:${port}/api/v1`,
     timeout: 1000,
     maxRedirects: 0,
     validateStatus(status) {
