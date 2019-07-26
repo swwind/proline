@@ -34,7 +34,7 @@ const spawnClient = (server: string) => {
 
 const exitClient = () => {
   exit = true;
-  if (child) {
+  if (child && !child.killed) {
     child.kill('SIGINT');
   }
 };
