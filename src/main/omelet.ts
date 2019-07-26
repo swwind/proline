@@ -112,7 +112,7 @@ const createClient = (server: string) => {
     socket.on('end', () => {
       log.log('Socket ended');
     });
-    log.log(`Socket started for port: ${localport}`);
+    log.log(`Socket started with port: ${localport}`);
   }, 5000);
 
 };

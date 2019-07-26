@@ -15,10 +15,9 @@ router.get('/subscribe', async (ctx) => {
   const { cid } = ctx.query;
   const error = await Posts.subscribe(cid);
   if (error) {
-    ctx.response.status = 500;
-    ctx.response.body = error;
+    ctx.end(500, error);
   } else {
-    ctx.response.status = 200;
+    ctx.end(200, 'OK');
   }
 });
 
@@ -26,13 +25,12 @@ router.get('/subscribe', async (ctx) => {
 router.get('/unsubscribe', async (ctx) => {
   const { cid } = ctx.query;
   await Posts.unsubscribe(cid);
-  ctx.response.status = 200;
+  ctx.end(200, 'OK');
 });
 
 // 获得订阅列表
 router.get('/sublist', (ctx) => {
-  ctx.response.status = 200;
-  ctx.response.body = Posts.subscribedList();
+  ctx.end(200, Posts.subscribedList());
 });
 
 // 获取文章列表
@@ -40,10 +38,9 @@ router.get('/postlist', async (ctx) => {
   const { cid } = ctx.query;
   const result = await Posts.getPostList(cid);
   if (result) {
-    ctx.response.status = 200;
-    ctx.response.body = result;
+    ctx.end(200, result);
   } else {
-    return ctx.throw(404);
+    ctx.end(404, 'NOT FOUND');
   }
 });
 
@@ -52,10 +49,9 @@ router.get('/postinfo', async (ctx) => {
   const { cid, pid } = ctx.query;
   const result = await Posts.getPostInfo(cid, pid);
   if (result) {
-    ctx.response.status = 200;
-    ctx.response.body = result;
+    ctx.end(200, result);
   } else {
-    return ctx.throw(404);
+    ctx.end(404, 'NOT FOUND');
   }
 });
 
@@ -63,11 +59,10 @@ router.get('/postinfo', async (ctx) => {
 router.get('/generatekey', async (ctx) => {
   const result = await Encrypt.generateKeyPair();
 
-  ctx.response.status = 200;
-  ctx.response.body = {
+  ctx.end(200, {
     publicKey: key2string(result.publicKey),
     privateKey: key2string(result.privateKey),
-  };
+  });
 });
 
 // 注册新频道
@@ -76,7 +71,7 @@ router.post('/regester-publickey', async (ctx) => {
 
   Posts.registerPublicKey(publicKey);
 
-  ctx.response.status = 200;
+  ctx.end(200, 'OK');
 });
 
 // 签名文章
@@ -85,8 +80,7 @@ router.post('/signpost', async (ctx) => {
 
   post.signature = Encrypt.signPostInfo(Encrypt.string2prvkey(privateKey), post);
 
-  ctx.response.status = 200;
-  ctx.response.body = post;
+  ctx.end(200, post);
 });
 
 // 发布文章
@@ -94,14 +88,21 @@ router.post('/publish', async (ctx) => {
   const { post, cid } = ctx.request.body;
   Posts.addPost(cid, post);
 
-  ctx.response.status = 200;
+  ctx.end(200, 'OK');
 });
 
+app.use(async (ctx, next) => {
+  ctx.end = (status: number, msg: string) => {
+    ctx.response.status = status;
+    ctx.response.body = msg;
+  };
+  await next();
+});
 app.use(async (ctx, next) => {
   if (ctx.ip === '::1') {
     await next();
   } else {
-    ctx.throw(403);
+    ctx.end(403, 'FORBIDDEN');
   }
 });
 

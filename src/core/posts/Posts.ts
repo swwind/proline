@@ -4,7 +4,6 @@ import Peers from '../peers/Peers';
 import { string2pubkey, verifyPostInfo, verifyPublicKey, generateChannelID } from '../encrypt';
 import * as hash from 'object-hash';
 import * as R from 'ramda';
-import log from 'electron-log';
 
 const store = new Store('proline-core', {
   postlist: { }, // postlist[cid]
@@ -54,11 +53,8 @@ export default class Posts {
       return localData;
     }
 
-    log.log('Get Post Info Step[1]');
     const fres = await Peers.each((pr) => pr.queryPostInfo(cid, pid));
-    log.log('Get Post Info Step[2]');
     const publickey = await this.getPublicKey(cid, online);
-    log.log('Get Post Info Step[3]');
 
     const result = fres.filter(verifyPostInfo.bind(null, publickey))[0] || null;
     if (result) {
