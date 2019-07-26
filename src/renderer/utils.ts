@@ -56,10 +56,10 @@ export const parseFile = async (filepath): Promise<IFileInfo> => {
   // 计算每一段的 hash
   const length = Math.floor((size - 1) / psize) + 1;
   const filebuffer = await fs.readFile(filepath);
-  const pieces = new Array(length).fill(0)
-    .map((_, index) => {
+  const pieces = await Promise.all(new Array(length).fill(0)
+    .map(async (_, index) => {
       return piecehash(filebuffer.slice(index * psize, (index + 1) * psize));
-    });
+    }));
 
   return {
     fid,

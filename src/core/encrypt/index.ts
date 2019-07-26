@@ -31,9 +31,6 @@ export const signPostInfo = (privateKey: crypto.KeyObject, postinfo: IPostInfo) 
 };
 
 export const string2pubkey = (publicKey: string) => {
-  /* eslint-disable-next-line */
-  console.log(process.versions);
-
   return crypto.createPublicKey({
     key: Buffer.from(publicKey, 'hex'),
     type: 'pkcs1',
@@ -57,7 +54,12 @@ export const key2string = (key: crypto.KeyObject) => {
 export const generateChannelID = (publicKey: string) => {
   return md5(Buffer.from(publicKey, 'hex'));
 };
+
 export const verifyPublicKey = (cid: string, publicKey: string | crypto.KeyObject) => {
+  if (!publicKey) {
+    return false;
+  }
+
   if (typeof publicKey !== 'string') {
     publicKey = key2string(publicKey);
   }
