@@ -39,7 +39,7 @@
 <script>
 import { getCreatedChannelList, getChannelName, getPrivateKey, signPost, publishPost } from '../../backend';
 import marked from 'marked';
-import { toReadableSize } from '../../utils';
+import { toReadableSize, parseFile, randomID } from '../../utils';
 import { remote } from 'electron';
 import { promises as fs } from 'fs';
 import { basename } from 'path';
@@ -114,7 +114,7 @@ export default {
         return;
       }
 
-      const pid = md5(new Date().toISOString());
+      const pid = randomID(16);
       const privateKey = getPrivateKey(cid);
 
       if (!privateKey) {
@@ -123,11 +123,17 @@ export default {
         return;
       }
 
+      this.perror = 'Processing the files, please wait...';
+
+      const files = await Promise.all(this.files.map((file) => {
+        return parseFile(file.path);
+      }));
+
       const post = await signPost({
         pid,
         title,
         content,
-        files: [], // TODO: FILE
+        files,
         pubtime: Date.now(),
         signature: '',
       }, privateKey);
@@ -146,6 +152,7 @@ export default {
         return;
       }
 
+      this.perror = null;
       this.waiting = false;
       window.location.href = `/#/post/${cid}/${pid}`;
     }

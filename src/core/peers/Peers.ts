@@ -29,8 +29,9 @@ export default class Peers {
    * 全部执行
    */
   public static each<T>(fn: (pr: Peer) => Promise<T>) {
-    const ps = Array.from(this.prs.values()).map((pr) => {
+    const ps = Array.from(this.prs).map((pr) => {
       return new Promise<T>((resolve) => {
+        // resolve undefined if error
         fn(pr).then(resolve, () => resolve());
       });
     });

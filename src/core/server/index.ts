@@ -3,17 +3,15 @@ import * as Router from 'koa-router';
 import * as mount from 'koa-mount';
 import * as logger from 'koa-logger';
 import * as bodyRouter from 'koa-bodyparser';
-import Posts from '../posts/Posts';
-import { key2string, verifyPostInfo } from '../encrypt';
+import * as Posts from '../posts/Posts';
+import * as Channels from '../posts/Channels';
+import * as Files from '../posts/Files';
+import { key2string } from '../encrypt';
 
 const api = new Koa();
 const router = new Router();
 
-// 询问拥有的以及正在下载的文件列表
-router.get('/filelist', async (ctx) => {
-  // FIXME: 在这里获取文件列表
-  ctx.end(200, []);
-});
+// =================== GET ===================
 
 // 询问频道内文章列表
 // - cid
@@ -21,7 +19,7 @@ router.get('/postlist', async (ctx) => {
   if (!ctx.query.cid) {
     return ctx.end(400, 'BAD REQUEST');
   }
-  const result = await Posts.getPostList(ctx.query.cid, 'local-only');
+  const result = await Channels.getPostList(ctx.query.cid, 'offline');
   if (result) {
     ctx.end(200, result);
   } else {
@@ -36,7 +34,22 @@ router.get('/postinfo', async (ctx) => {
   if (!ctx.query.cid || !ctx.query.pid) {
     return ctx.end(400, 'BAD REQUEST');
   }
-  const result = await Posts.getPostInfo(ctx.query.cid, ctx.query.pid, 'local-only');
+  const result = await Posts.getPostInfo(ctx.query.cid, ctx.query.pid, 'offline');
+  if (result) {
+    ctx.end(200, result);
+  } else {
+    ctx.end(404, 'NOT FOUND');
+  }
+});
+
+// 获取文件信息（种子）
+// - cid
+// - fid
+router.get('/fileinfo', async (ctx) => {
+  if (!ctx.query.cid || !ctx.query.fid) {
+    return ctx.end(400, 'BAD REQUEST');
+  }
+  const result = await Files.getFileInfo(ctx.query.cid, ctx.query.fid, 'offline');
   if (result) {
     ctx.end(200, result);
   } else {
@@ -49,6 +62,9 @@ router.get('/postinfo', async (ctx) => {
 // - fid
 // - index
 router.get('/filepiece', async (ctx) => {
+  if (!ctx.query.cid || !ctx.query.fid || !ctx.query.index) {
+    return ctx.end(400, 'BAD REQUEST');
+  }
   ctx.end(501, 'NOT FINISHED');
 });
 
@@ -58,7 +74,7 @@ router.get('/publickey', async (ctx) => {
   if (!ctx.query.cid) {
     return ctx.end(400, 'BAD REQUEST');
   }
-  const result = await Posts.getPublicKey(ctx.query.cid, 'local-only');
+  const result = await Channels.getPublicKey(ctx.query.cid, 'offline');
   if (result) {
     ctx.end(200, key2string(result));
   } else {
@@ -66,15 +82,18 @@ router.get('/publickey', async (ctx) => {
   }
 });
 
+//================= POST =================
+
 // 发送消息
 // - message
 router.post('/message', async (ctx) => {
-  if (!ctx.request.body.message) {
+  const body = ctx.request.body;
+  if (!body.message) {
     return ctx.end(400, 'BAD REQUEST');
   }
   /* eslint-disable-next-line no-console */
-  console.log(`recv: ${ctx.request.body.message}`);
-  ctx.response.status = 200;
+  console.log(`recv: ${body.message}`);
+  ctx.end(200, 'OK');
 });
 
 // 主动推送文章更新
@@ -85,22 +104,19 @@ router.post('/pushpost', async (ctx) => {
   if (!body.cid || !body.post) {
     return ctx.end(400, 'BAD REQUEST');
   }
-
-  if (!Posts.isSubscribed(body.cid)) {
+  if (!Channels.subscribed(body.cid)) {
     return ctx.end(400, 'NOT SUBSCRIBED');
   }
-
-  const publickey = await Posts.getPublicKey(body.cid);
-  if (!publickey || !verifyPostInfo(publickey, body.post)) {
-    return ctx.end(400, 'FAKE POST');
+  try {
+    Posts.addPost(body.cid, body.post);
+  } catch (e) {
+    ctx.end(400, e.message.toUpperCase());
   }
-
-  ctx.response.status = 200;
-  Posts.addPost(body.cid, body.post);
+  ctx.end(200, 'OK');
 });
 
 api.use(async (ctx, next) => {
-  ctx.end = (status: number, msg: string) => {
+  ctx.end = (status, msg) => {
     ctx.response.status = status;
     ctx.response.body = msg;
   };

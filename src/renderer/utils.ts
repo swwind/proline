@@ -37,6 +37,10 @@ const piecehash = (buffer: Buffer) => {
     .slice(0, 16);
 };
 
+export const randomID = (length: number) => {
+  return crypto.randomBytes(length).toString('hex');
+};
+
 /**
  * 解析文件作为种子
  */
@@ -51,7 +55,7 @@ export const parseFile = async (filepath): Promise<IFileInfo> => {
     ? 4 * 1024 * 1024 // 4MB   if > 1G
     : 256 * 1024; // 256KB if < 1G
   const filename = basename(filepath);
-  const fid = crypto.randomBytes(16).toString('hex');
+  const fid = randomID(16);
 
   // 计算每一段的 hash
   const length = Math.floor((size - 1) / psize) + 1;

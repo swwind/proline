@@ -8,7 +8,13 @@
       <div v-text="(new Date(post.pubtime)).toLocaleDateString()" class="time"></div>
       <div class="content" v-html="marked(post.content)"></div>
       <h2>Files</h2>
-      <div>TODO</div>
+      <div class="list">
+        <div v-if="!post.files.length" class="nothing">No files</div>
+        <div class="item" v-for="(file, index) in post.files" :key="index">
+          <span v-text="file.filename"></span>
+          <span v-text="toReadableSize(file.size)" class="right"></span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -16,6 +22,7 @@
 <script>
 import { getPostInfo, markPostRead } from '../backend';
 import marked from 'marked';
+import { toReadableSize } from '../utils';
 
 import Vue from 'vue';
 
@@ -49,7 +56,8 @@ export default Vue.extend({
         sanitize: true,
         silent: true,
       });
-    }
+    },
+    toReadableSize
   }
 });
 

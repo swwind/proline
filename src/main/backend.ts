@@ -2,7 +2,10 @@
 
 import Koa from 'koa';
 import Router from 'koa-router';
-import { Posts, server, Encrypt } from '../core';
+import * as Posts from '../core/posts/Posts';
+import * as Channels from '../core/posts/Channels';
+import server from '../core/server';
+import * as Encrypt from '../core/encrypt';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
 import { key2string } from '../core/encrypt';
@@ -13,45 +16,55 @@ const router = new Router();
 // 订阅新的频道
 router.get('/subscribe', async (ctx) => {
   const { cid } = ctx.query;
-  const error = await Posts.subscribe(cid);
-  if (error) {
-    ctx.end(500, error);
-  } else {
-    ctx.end(200, 'OK');
+  try {
+    await Channels.subscribe(cid);
+  } catch (e) {
+    ctx.end(500, e.message);
   }
+  ctx.end(200, 'OK');
 });
 
 // 取消订阅
 router.get('/unsubscribe', async (ctx) => {
   const { cid } = ctx.query;
-  await Posts.unsubscribe(cid);
+  try {
+    await Channels.unsubscribe(cid);
+  } catch (e) {
+    ctx.end(500, e.message);
+  }
   ctx.end(200, 'OK');
 });
 
 // 获得订阅列表
 router.get('/sublist', (ctx) => {
-  ctx.end(200, Posts.subscribedList());
+  ctx.end(200, Channels.getSubscribedList());
 });
 
 // 获取文章列表
 router.get('/postlist', async (ctx) => {
   const { cid } = ctx.query;
-  const result = await Posts.getPostList(cid);
-  if (result) {
+  try {
+    const result = await Channels.getPostList(cid);
+    if (!result) {
+      throw new Error('NOT FOUND');
+    }
     ctx.end(200, result);
-  } else {
-    ctx.end(404, 'NOT FOUND');
+  } catch (e) {
+    ctx.end(500, e.message);
   }
 });
 
 // 获取文章内容
 router.get('/postinfo', async (ctx) => {
   const { cid, pid } = ctx.query;
-  const result = await Posts.getPostInfo(cid, pid);
-  if (result) {
+  try {
+    const result = await Posts.getPostInfo(cid, pid);
+    if (!result) {
+      throw new Error('NOT FOUND');
+    }
     ctx.end(200, result);
-  } else {
-    ctx.end(404, 'NOT FOUND');
+  } catch (e) {
+    ctx.end(500, e.message);
   }
 });
 
@@ -69,7 +82,7 @@ router.get('/generatekey', async (ctx) => {
 router.post('/regester-publickey', async (ctx) => {
   const { publicKey } = ctx.request.body;
 
-  Posts.registerPublicKey(publicKey);
+  Channels.registerPublicKey(publicKey);
 
   ctx.end(200, 'OK');
 });
@@ -78,21 +91,24 @@ router.post('/regester-publickey', async (ctx) => {
 router.post('/signpost', async (ctx) => {
   const { post, privateKey } = ctx.request.body;
 
-  post.signature = Encrypt.signPostInfo(Encrypt.string2prvkey(privateKey), post);
+  post.signature = Encrypt.signObject(Encrypt.string2prvkey(privateKey), post);
 
   ctx.end(200, post);
 });
 
-// 发布文章
+// 发布文章，文章必须经过签名
 router.post('/publish', async (ctx) => {
   const { post, cid } = ctx.request.body;
-  Posts.addPost(cid, post);
-
-  ctx.end(200, 'OK');
+  try {
+    Posts.addPost(cid, post);
+    ctx.end(200, 'OK');
+  } catch (e) {
+    ctx.end(500, e.message);
+  }
 });
 
 app.use(async (ctx, next) => {
-  ctx.end = (status: number, msg: string) => {
+  ctx.end = (status, msg) => {
     ctx.response.status = status;
     ctx.response.body = msg;
   };
