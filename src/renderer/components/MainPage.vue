@@ -3,19 +3,42 @@
 <template>
   <div>
     <h1>Proline (ﾉ&gt;ω&lt;)ﾉ</h1>
-    <div class="loading" v-if="error" v-text="error"></div>
+    <div
+      v-if="error"
+      class="loading"
+      v-text="error"
+    />
     <div v-if="!error && chans">
       <div class="setsumei">
         Here are the channels you subscribed.
       </div>
       <div class="main list">
-        <div v-if="!chans.length" class="nothing">No channels subscribed</div>
-        <router-link v-for="(chan, index) in chans" class="item" :key="index" :to="'/chan/' + chan.cid">
-          <span class="chan-title" v-text="chan.cname"></span>
-          <span class="right id" v-text="chan.cid"></span>
+        <div
+          v-if="!chans.length"
+          class="nothing"
+        >
+          No channels subscribed
+        </div>
+        <router-link
+          v-for="(chan, index) in chans"
+          :key="index"
+          class="item"
+          :to="'/chan/' + chan.cid"
+        >
+          <span
+            class="chan-title"
+            v-text="chan.cname"
+          />
+          <span
+            class="right id"
+            v-text="chan.cid"
+          />
         </router-link>
       </div>
-      <router-link to="/subscribe-chan" class="real-button">
+      <router-link
+        to="/subscribe-chan"
+        class="real-button"
+      >
         <i class="icon">add</i>
         Subscribe Channel
       </router-link>
@@ -23,15 +46,22 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { getSubscribedChannelList, getChannelName } from '../backend';
-export default {
-  name: 'main-page',
+import Vue from 'vue';
+
+interface IChannelSimpleInfo {
+  cid: string;
+  cname: string;
+}
+
+export default Vue.extend({
+  name: 'MainPage',
   data() {
     return {
       error: 'Loading...',
-      chans: null,
-    }
+      chans: [] as IChannelSimpleInfo[],
+    };
   },
   async mounted() {
     try {
@@ -40,16 +70,16 @@ export default {
         return {
           cid,
           cname: getChannelName(cid)
-        }
+        };
       });
-      this.error = null;
+      this.error = '';
       this.chans = chans;
     } catch (e) {
       this.error = e.toString();
       console.error(e);
     }
   }
-}
+});
 </script>
 
 <style>

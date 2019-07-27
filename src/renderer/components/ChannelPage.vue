@@ -2,41 +2,78 @@
 
 <template>
   <div class="chan">
-    <h1 v-text="title"></h1>
-    <div class="loading" v-if="error" v-text="error"></div>
+    <h1 v-text="title" />
+    <div
+      v-if="error"
+      class="loading"
+      v-text="error"
+    />
     <div v-if="!error && posts">
-      <div v-text="cid" class="id"></div>
+      <div
+        class="id"
+        v-text="cid"
+      />
       <div class="post list">
-        <div v-if="!posts.length" class="nothing">No posts published</div>
-        <router-link v-for="(post, index) in posts" class="item" :class="{ unread: !post.read }" :key="index"
-            :to="'/post/' + cid + '/' + post.pid">
-          <span class="title h3" v-text="post.title"></span>
-          <span class="right" v-text="(new Date(post.pubtime)).toLocaleDateString()"></span>
-          <div class="content" v-text="post.content"></div>
+        <div
+          v-if="!posts.length"
+          class="nothing"
+        >
+          No posts published
+        </div>
+        <router-link
+          v-for="(post, index) in posts"
+          :key="index"
+          class="item"
+          :class="{ unread: !post.read }"
+          :to="'/post/' + cid + '/' + post.pid"
+        >
+          <span
+            class="title h3"
+            v-text="post.title"
+          />
+          <span
+            class="right"
+            v-text="(new Date(post.pubtime)).toLocaleDateString()"
+          />
+          <div
+            class="content"
+            v-text="post.content"
+          />
         </router-link>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { getPostList, getChannelName, isPostRead } from '../backend';
-export default {
-  name: 'chan-page',
+import Vue from 'vue';
+
+interface IPostSimpleInfo {
+  read: boolean;
+  pid: string;
+  title: string;
+  pubtime: number;
+}
+
+export default Vue.extend({
+  name: 'ChanPage',
   data() {
     const cid = this.$route.params.cid;
+
     return {
       cid,
       error: 'Loading...',
       title: getChannelName(cid),
-      posts: null,
-    }
+      posts: [] as IPostSimpleInfo[],
+    };
   },
   async mounted() {
     const cid = this.$route.params.cid;
     const originPost = await getPostList(cid);
     if (!originPost) {
       this.error = 'An Error occurred';
+
       return;
     }
 
@@ -44,13 +81,13 @@ export default {
       return {
         ...post,
         read: isPostRead(cid, post.pid),
-      }
+      };
     });
 
-    this.error = null;
+    this.error = '';
     this.posts = posts;
   }
-}
+});
 </script>
 
 <style>

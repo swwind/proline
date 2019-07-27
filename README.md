@@ -2,13 +2,38 @@
 
 A decentrialized post subscriber and file downloader.
 
+## Feature
+
+- cross-platform
+- simple protocol, based on HTTP
+- an awesome backend which creates a virtual private network free of charge
+
 ## TODO
 
-- [x] fix build bug
+- [x] drag and drop files
 - [ ] file sharing
 - [ ] file downloading
 - [x] post publishing
 - [ ] mime and protocol
+- [ ] set night theme
+- [ ] p2p instant message
+
+## Development
+
+```bash
+# INSTALL & DEV
+
+yarn install
+# install timber3252/omelet as backend
+./install_omelet.sh
+yarn dev
+
+# BUILD
+
+yarn run build
+```
+
+**Note:** backend interface is not finished yet.
 
 ## See Also
 

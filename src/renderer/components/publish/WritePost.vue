@@ -3,32 +3,85 @@
 <template>
   <div @drop="alert(233)">
     <h1>Write New Post (*´∀`)~♥</h1>
-    <div v-text="cerror" class="error"></div>
+    <div
+      v-if="cerror"
+    >
+      <div
+        class="error"
+        v-text="cerror"
+      />
+      <router-link
+        to="/create-chan"
+        class="real-button"
+      >
+        <i class="icon">add</i>
+        Create A New Channel
+      </router-link>
+    </div>
     <div v-if="!cerror">
       <div class="small-setsumei">
         Select channel:
       </div>
-      <select class="select" v-model="select">
-        <option v-for="(chan, index) of chans" :value="chan.cid" v-text="chan.cname" :key="index"></option>
+      <select
+        v-model="select"
+        class="select"
+      >
+        <option
+          v-for="(chan, index) of chans"
+          :key="index"
+          :value="chan.cid"
+          v-text="chan.cname"
+        />
       </select>
-      <input type="text" v-model="title" placeholder="Title" class="input-text">
+      <input
+        v-model="title"
+        type="text"
+        placeholder="Title"
+        class="input-text"
+      >
       <div class="markdown-editor">
-        <textarea v-model="content"></textarea>
-        <div class="preview" v-html="marked(content)"></div>
+        <textarea v-model="content" />
+        <div
+          class="preview"
+          v-html="marked(content)"
+        />
       </div>
-      <div class="fileupload" @click="selectFile()">
-        Click To Open
+      <div
+        class="fileupload"
+        @click="selectFile()"
+        @drop="handleDrop($event)"
+      >
+        Click To Open / Drop Files Here
       </div>
       <div class="list">
-        <div v-if="!files.length" class="nothing">No files</div>
-        <div class="item" v-for="(file, index) in files"
-            :key="index" @click="removeFile(file)">
-          <span v-text="file.name"></span>
-          <span v-text="file.size" class="right"></span>
+        <div
+          v-if="!files.length"
+          class="nothing"
+        >
+          No files
+        </div>
+        <div
+          v-for="(file, index) in files"
+          :key="index"
+          class="item"
+          @click="removeFile(file)"
+        >
+          <span v-text="file.name" />
+          <span
+            class="right"
+            v-text="toReadableSize(file.size)"
+          />
         </div>
       </div>
-      <div class="error" v-text="perror"></div>
-      <button :disabled="waiting" class="green" @click="applyPost()">
+      <div
+        class="error"
+        v-text="perror"
+      />
+      <button
+        :disabled="waiting"
+        class="green"
+        @click="applyPost()"
+      >
         <i class="icon">check</i>
         Publish
       </button>
@@ -36,37 +89,36 @@
   </div>
 </template>
 
-<script>
-import { getCreatedChannelList, getChannelName, getPrivateKey, signPost, publishPost } from '../../backend';
+<script lang="ts">
+import { getCreatedChannelList, getChannelName, getPrivateKey, signPost, publishPost, publishFile } from '../../backend';
 import marked from 'marked';
-import { toReadableSize, parseFile, randomID } from '../../utils';
+import { toReadableSize, parseFile, randomID, extractSummaryFromFileInfo } from '../../utils';
 import { remote } from 'electron';
 import { promises as fs } from 'fs';
 import { basename } from 'path';
-import md5 from 'md5';
-import axios from 'axios';
+import Vue from 'vue';
+import { IPostInfo } from '../../../core/types';
 
-export default {
-  name: 'write-post',
+export default Vue.extend({
+  name: 'WritePost',
   data() {
     const chans = getCreatedChannelList().map((cid) => ({ cid, cname: getChannelName(cid) }));
+
     return {
-      cerror: '', // error on channel
+      cerror: chans.length
+        ? ''
+        : 'Please create a channel first.', // error on channel
       perror: '', // error on publish
       chans,
       content: '# hello proline',
-      files: [],
+      files: [] as { name: string; path: string; size: number }[],
       waiting: false,
       select: chans[0] && chans[0].cid,
       title: '',
-    }
+    };
   },
   methods: {
-    async createChannel() {
-      if (!this.chans.length) {
-        this.error = 'Please create a channel first.';
-      }
-    },
+    toReadableSize,
     marked(text) {
       return marked(text, {
         sanitize: true,
@@ -77,8 +129,8 @@ export default {
       this.files.push({
         path: file.path,
         name: file.name,
-        size: toReadableSize(file.size),
-      })
+        size: file.size,
+      });
     },
     async selectFile() {
       const filelist = remote.dialog.showOpenDialog({
@@ -104,65 +156,85 @@ export default {
     async applyPost() {
       this.waiting = true;
 
-      const cid = this.select;
-      const content = this.content;
-      const title = this.title;
+      try {
 
-      if (!title) {
-        this.perror = 'You must provide title.';
+        const cid = this.select;
+        const content = this.content;
+        const title = this.title;
+
+        if (!title) {
+          throw new Error('You must provide title.');
+        }
+
+        const pid = randomID(16);
+        const privateKey = getPrivateKey(cid);
+
+        if (!privateKey) {
+          throw new Error('Private key not found');
+        }
+
+        this.perror = 'Processing files, please wait...';
+
+        const fileinfos = await Promise.all(this.files.map(async (file) => {
+          const fileinfo = await signPost(await parseFile(file.path), privateKey);
+          await publishFile(cid, fileinfo, file.path);
+
+          return fileinfo;
+        }));
+
+        const files = fileinfos.map(extractSummaryFromFileInfo);
+
+        const _postinfo: IPostInfo = {
+          pid,
+          title,
+          content,
+          files,
+          pubtime: Date.now(),
+          signature: '',
+        };
+
+        const postinfo = await signPost(_postinfo, privateKey);
+
+        await publishPost(cid, postinfo);
+
+        // 跳转到文章页面
+        window.location.href = `/#/post/${cid}/${pid}`;
+      } catch (e) {
+        this.perror = e.message;
         this.waiting = false;
-        return;
       }
 
-      const pid = randomID(16);
-      const privateKey = getPrivateKey(cid);
+    },
 
-      if (!privateKey) {
-        this.perror = 'Error: Private Key Not Found';
-        this.waiting = false;
+    // 处理 drop 事件
+    handleDrop(e: DragEvent) {
+      e.preventDefault();
+      if (!e.dataTransfer) {
         return;
       }
-
-      this.perror = 'Processing the files, please wait...';
-
-      const files = await Promise.all(this.files.map((file) => {
-        return parseFile(file.path);
-      }));
-
-      const post = await signPost({
-        pid,
-        title,
-        content,
-        files,
-        pubtime: Date.now(),
-        signature: '',
-      }, privateKey);
-
-      if (!post) {
-        this.perror = 'Error: Failed Sign Post';
-        this.waiting = false;
-        return;
+      if (e.dataTransfer.items) {
+        Array.from(e.dataTransfer.items)
+          .filter((item) => item.kind === 'file')
+          .map((item) => item.getAsFile())
+          .map(this.addFile.bind(this));
+      } else {
+        Array.from(e.dataTransfer.files)
+          .map(this.addFile.bind(this));
       }
+    },
 
-      const success = await publishPost(cid, post);
-
-      if (!success) {
-        this.perror = `Error: Client Rejected Post: ${response.status}`;
-        this.waiting = false;
-        return;
-      }
-
-      this.perror = null;
-      this.waiting = false;
-      window.location.href = `/#/post/${cid}/${pid}`;
+    alert() {
+      // do nothing...
+      // it's a vue bug...???
     }
   }
-}
+});
 </script>
 
 <style lang="scss">
 .error {
   color: red;
+  margin: 20px 0;
 }
 
 .fileupload {

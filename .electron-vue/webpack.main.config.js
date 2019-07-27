@@ -12,7 +12,7 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.ts$/,
+          test: /\.(ts|vue)$/,
           enforce: 'pre',
           exclude: /node_modules/,
           use: {

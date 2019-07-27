@@ -2,38 +2,65 @@
 
 <template>
   <div class="post">
-    <h1 v-text="title"></h1>
-    <div class="loading" v-if="error" v-text="error"></div>
+    <h1 v-text="title" />
+    <div
+      v-if="error"
+      class="loading"
+      v-text="error"
+    />
     <div v-if="!error && post">
-      <div v-text="(new Date(post.pubtime)).toLocaleDateString()" class="time"></div>
-      <div class="content" v-html="marked(post.content)"></div>
+      <div class="time">
+        <span v-text="(new Date(post.pubtime)).toLocaleDateString()" />
+      </div>
+      <div
+        class="content"
+        v-html="marked(post.content)"
+      />
       <h2>Files</h2>
       <div class="list">
-        <div v-if="!post.files.length" class="nothing">No files</div>
-        <div class="item" v-for="(file, index) in post.files" :key="index">
-          <span v-text="file.filename"></span>
-          <span v-text="toReadableSize(file.size)" class="right"></span>
+        <div
+          v-if="!post.files.length"
+          class="nothing"
+        >
+          No files
         </div>
+        <router-link
+          v-for="(file, index) in post.files"
+          :key="index"
+          class="item"
+          :title="file.fid"
+          :to="`/file/${cid}/${file.fid}`"
+        >
+          <span v-text="file.filename" />
+          <span
+            class="right"
+            v-text="toReadableSize(file.size)"
+          />
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { getPostInfo, markPostRead } from '../backend';
 import marked from 'marked';
 import { toReadableSize } from '../utils';
 
 import Vue from 'vue';
+import { IPostInfo } from '../../core/types';
 
 export default Vue.extend({
-  name: 'post-page',
+  name: 'PostPage',
   data() {
     const { cid, pid } = this.$route.params;
+
     return {
+      cid,
+      pid,
       error: 'Loading...',
       title: 'Loading...',
-      post: null,
+      post: null as IPostInfo | null,
     };
   },
   async mounted() {
@@ -43,7 +70,7 @@ export default Vue.extend({
       this.error = 'Please review this page a few moments later';
       this.title = 'Post not found';
     } else {
-      this.error = null;
+      this.error = '';
       this.post = post;
       this.title = post.title;
 

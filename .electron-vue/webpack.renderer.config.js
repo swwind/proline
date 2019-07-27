@@ -16,7 +16,7 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.ts$/,
+          test: /\.(ts|vue)$/,
           enforce: 'pre',
           exclude: /node_modules/,
           use: {
@@ -43,7 +43,8 @@ module.exports = (env, argv) => {
           exclude: /node_modules/,
           loader: 'ts-loader',
           options: {
-            appendTsSuffixTo: [/\.vue$/]
+            appendTsSuffixTo: [/\.vue$/],
+            transpileOnly: true,
           }
         },
         {

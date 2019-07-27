@@ -17,18 +17,17 @@
   </div>
 </template>
 
-<script>
-/*
-import { getDownloadList } from '../backend';
-import { toSize } from '../utils';
-export default {
-  name: 'download-page',
-  data() {
-    return { fs: getDownloadList() };
-  },
-  methods: { toSize }
-}
-*/
+<script lang="ts">
+
+// import { getDownloadList } from '../backend';
+// import { toSize } from '../utils';
+// export default {
+// name: 'download-page',
+// data() {
+// return { fs: getDownloadList() };
+// },
+// methods: { toSize }
+// }
 </script>
 
 <style>

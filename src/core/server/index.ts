@@ -82,7 +82,7 @@ router.get('/publickey', async (ctx) => {
   }
 });
 
-//================= POST =================
+// ================= POST =================
 
 // 发送消息
 // - message
@@ -116,7 +116,7 @@ router.post('/pushpost', async (ctx) => {
 });
 
 api.use(async (ctx, next) => {
-  ctx.end = (status, msg) => {
+  ctx.end = (status: number, msg: string) => {
     ctx.response.status = status;
     ctx.response.body = msg;
   };

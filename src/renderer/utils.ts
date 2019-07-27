@@ -2,7 +2,7 @@
 import { promises as fs } from 'fs';
 import { basename } from 'path';
 import crypto from 'crypto';
-import { IFileInfo } from '../core/types';
+import { IFileInfo, IFileSummary } from '../core/types';
 
 export const toReadableSize = (size) => {
   const b = size;
@@ -42,7 +42,7 @@ export const randomID = (length: number) => {
 };
 
 /**
- * 解析文件作为种子
+ * 解析文件作为种子，没有签名
  */
 export const parseFile = async (filepath): Promise<IFileInfo> => {
   const stat = await fs.lstat(filepath);
@@ -71,5 +71,14 @@ export const parseFile = async (filepath): Promise<IFileInfo> => {
     size,
     psize,
     pieces,
+    signature: '',
+  };
+};
+
+export const extractSummaryFromFileInfo = (fi: IFileInfo): IFileSummary => {
+  return {
+    fid: fi.fid,
+    filename: fi.filename,
+    size: fi.size,
   };
 };

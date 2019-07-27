@@ -3,10 +3,22 @@
 <template>
   <div>
     <h1>Create New Channel (๑• ω •๑)</h1>
-    <div v-if="!genkey">Generating Key Pair...</div>
-    <div v-if="genkey">New Channel ID: {{ cid }}</div>
-    <input v-model="cname" type="text" placeholder="Channel Name" class="input-text">
-    <div class="error" v-text="error"></div>
+    <div v-if="!keypair">
+      Generating Key Pair...
+    </div>
+    <div v-if="keypair">
+      New Channel ID: {{ cid }}
+    </div>
+    <input
+      v-model="cname"
+      type="text"
+      placeholder="Channel Name"
+      class="input-text"
+    >
+    <div
+      class="error"
+      v-text="error"
+    />
     <button @click="createChannel()">
       <i class="icon">check</i>
       Create Channel
@@ -14,44 +26,42 @@
   </div>
 </template>
 
-<script>
-import { subscribeChannel, getSubscribedChannelList, generateNewKey, registerPublicKey, registerPrivateKey } from '../../backend';
+<script lang="ts">
+import { subscribeChannel, generateNewKey, registerPublicKey, registerPrivateKey, IKeyPair } from '../../backend';
 import md5 from 'md5';
+import Vue from 'vue';
 
-export default {
-  name: 'create-chan',
+export default Vue.extend({
+  name: 'CreateChan',
   data() {
     return {
       error: '',
-      genkey: false,
       cid: '',
-      keypair: null,
+      keypair: null as IKeyPair | null,
       cname: '',
-    }
+    };
   },
   async mounted() {
     const keypair = await generateNewKey();
     if (!keypair) {
       this.error = 'Failed to generate a random key pair';
+
       return;
     }
     this.keypair = keypair;
-    this.genkey = true;
     this.cid = md5(Buffer.from(keypair.publicKey, 'hex'));
   },
   methods: {
     async createChannel() {
-      if (!this.cname) {
-        this.error = 'Please give your channel a name';
-        return;
-      }
-
-      if (!this.genkey) {
-        this.error = 'Please wait while key pair generated';
-        return;
-      }
-
       try {
+        if (!this.cname) {
+          throw new Error('Please give your channel a name');
+        }
+
+        if (!this.keypair) {
+          throw new Error('Please wait while key pair generated');
+        }
+
         await registerPublicKey(this.keypair.publicKey);
         await registerPrivateKey(this.cid, this.keypair.privateKey);
         subscribeChannel(this.cid, this.cname);
@@ -62,7 +72,7 @@ export default {
       }
     }
   }
-}
+});
 </script>
 
 <style>

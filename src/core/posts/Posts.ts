@@ -37,7 +37,7 @@ export const getPostInfo = async (cid: string, pid: string, online: RequestType 
   }
 
   return result;
-}
+};
 
 
 /**
@@ -65,7 +65,8 @@ export const addPost = async (cid: string, post: IPostInfo) => {
 
   Channels.modifyPostList(cid, (ps) => {
     ps.push(summary);
+
     return ps;
   });
-}
+};
 

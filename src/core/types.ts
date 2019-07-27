@@ -1,14 +1,14 @@
 /**
  * 可签名物体
  */
-export interface SignObject {
+export interface ISignObject {
   signature: string;
 }
 
 /**
  * 文件信息，包含文件本身信息以及下载片段的信息
  */
-export interface IFileInfo extends SignObject {
+export interface IFileInfo extends ISignObject {
   fid: string;
   filename: string;
   size: number; // 文件大小
@@ -28,7 +28,7 @@ export interface IFileSummary {
 /**
  * 文章类型，包含内容以及文件
  */
-export interface IPostInfo extends SignObject {
+export interface IPostInfo extends ISignObject {
   pid: string;
   title: string;
   pubtime: number; // 发布时间

@@ -2,27 +2,48 @@
   <div id="app">
     <div class="container">
       <transition name="slide-fade">
-        <router-view></router-view>
+        <router-view />
       </transition>
     </div>
     <div class="leftnav">
-      <router-link to="/" class="button" title="Home">
+      <router-link
+        to="/"
+        class="button"
+        title="Home"
+      >
         <i class="icon">home</i>
       </router-link>
-      <router-link to="/download" class="button" title="Downloads">
+      <router-link
+        to="/download"
+        class="button"
+        title="Downloads"
+      >
         <i class="icon">cloud_download</i>
       </router-link>
-      <router-link to="/publish" class="button" title="Publish">
+      <router-link
+        to="/publish"
+        class="button"
+        title="Publish"
+      >
         <i class="icon">create</i>
       </router-link>
+      <router-link
+        to="/settings"
+        class="button"
+        title="Settings"
+      >
+        <i class="icon">settings</i>
+      </router-link>
     </div>
-    <div class="start-animation"></div>
-    <div class="logo">Proline</div>
+    <div class="start-animation" />
+    <div class="logo">
+      Proline
+    </div>
   </div>
 </template>
 
 <script>
-  export default { name: 'proline-frontend' }
+export default { name: 'ProlineFrontend' };
 </script>
 
 <style lang="scss">
@@ -30,7 +51,7 @@
 body, html {
   margin: 0;
   padding: 0;
-  font-family: 'WenQuanYi Zen Hei', 'WenQuanYi Micro Hei', 'Microsoft Yahei', sans-serif;
+  font-family: 'WenQuanYi Micro Hei', 'WenQuanYi Zen Hei', 'Microsoft Yahei', sans-serif;
 }
 
 .leftnav .button {

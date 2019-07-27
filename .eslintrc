@@ -1,5 +1,4 @@
 {
-  "parser": "@typescript-eslint/parser",
   "env": {
     "browser": true,
     "es6": true,
@@ -7,14 +6,17 @@
   },
   "extends": [
     "plugin:@typescript-eslint/recommended",
+    "plugin:vue/recommended",
     "eslint:recommended",
   ],
   "parserOptions": {
+    "parser": "@typescript-eslint/parser",
     "sourceType": "module",
     "ecmaVersion": 2018,
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
+    "vue/no-v-html": "off",
     "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
@@ -113,7 +115,7 @@
     "max-classes-per-file": "off",
     "max-depth": "error",
     "max-len": "off",
-    "max-lines": "error",
+    "max-lines": ["error", 500],
     "max-lines-per-function": "off",
     "max-nested-callbacks": "error",
     "max-params": ["error", 5],

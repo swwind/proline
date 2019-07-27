@@ -20,7 +20,7 @@ const store = new Store('proline-channel', {
 export const registerPublicKey = (publickey: string) => {
   const cid = generateChannelID(publickey);
   store.set(`publickey.${cid}`, publickey);
-}
+};
 
 /**
  * 获取公钥，如果没有则从 p2p 中获取。
@@ -42,14 +42,14 @@ export const getPublicKey = async (cid: string, online: RequestType = 'both') =>
   }
 
   return result ? string2pubkey(result) : null;
-}
+};
 
 /**
  * 订阅列表
  */
 export const getSubscribedList = (): string[] => {
   return store.get('subscribed');
-}
+};
 
 /**
  * 订阅频道
@@ -64,7 +64,7 @@ export const subscribe = async (cid: string) => {
   const subscribed = getSubscribedList();
   const set = new Set(subscribed).add(cid);
   store.set('subscribed', Array.from(set));
-}
+};
 
 /**
  * 取消订阅
@@ -75,7 +75,7 @@ export const unsubscribe = async (cid: string) => {
   const set = new Set(subscribed);
   set.delete(cid);
   store.set('subscribed', Array.from(set));
-}
+};
 
 /**
  * 是否订阅
@@ -85,7 +85,7 @@ export const subscribed = (cid: string) => {
   const subscribed: string[] = store.get('subscribed');
 
   return R.contains(cid, subscribed);
-}
+};
 
 /**
  * 获取文章列表，如果没有则从 p2p 中获取
@@ -108,7 +108,7 @@ export const getPostList = async (cid: string, online: RequestType = 'both') => 
   store.set(`postlist.${cid}`, result);
 
   return result;
-}
+};
 
 /**
  * 修改文章列表
@@ -118,5 +118,5 @@ export const getPostList = async (cid: string, online: RequestType = 'both') => 
 export const modifyPostList = (cid: string, fn: (t: IPostSummary[]) => IPostSummary[]) => {
   const data: IPostSummary[] = store.get(`postlist.${cid}`);
   const result = fn(data);
-  store.set(`postinfo.${cid}`, result);
-}
+  store.set(`postlist.${cid}`, result);
+};

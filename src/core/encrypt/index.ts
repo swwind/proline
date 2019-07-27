@@ -1,7 +1,7 @@
 import * as hash from 'object-hash';
 import * as crypto from 'crypto';
 import * as R from 'ramda';
-import { IPostInfo, SignObject } from '../types';
+import { ISignObject } from '../types';
 
 /**
  * 计算 md5
@@ -16,9 +16,9 @@ export const md5 = (buffer: Buffer) => {
 /**
  * 获得签名
  * @param {crypto.KeyObject} privateKey 私钥
- * @param {SignObject} object 签名对象
+ * @param {ISignObject} object 签名对象
  */
-export const signObject = <T extends SignObject> (privateKey: crypto.KeyObject, object: T) => {
+export const signObject = <T extends ISignObject> (privateKey: crypto.KeyObject, object: T) => {
   const sign = crypto.createSign('SHA256');
   sign.update(hash(object, { excludeKeys: R.equals('signature') }));
   sign.end();
@@ -83,7 +83,7 @@ export const verifyPublicKey = (cid: string) => (publicKey: string) => {
 /**
  * 验证签名，经过柯里化
  */
-export const verifySignature = (publicKey: crypto.KeyObject) => (signed: SignObject) => {
+export const verifySignature = <T extends ISignObject> (publicKey: crypto.KeyObject) => (signed: T) => {
 
   if (!signed || !publicKey) {
     return false;

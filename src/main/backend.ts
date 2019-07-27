@@ -3,12 +3,12 @@
 import Koa from 'koa';
 import Router from 'koa-router';
 import * as Posts from '../core/posts/Posts';
+import * as Files from '../core/posts/Files';
 import * as Channels from '../core/posts/Channels';
 import server from '../core/server';
 import * as Encrypt from '../core/encrypt';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
-import { key2string } from '../core/encrypt';
 
 const app = new Koa();
 const router = new Router();
@@ -68,13 +68,27 @@ router.get('/postinfo', async (ctx) => {
   }
 });
 
+// 获取文章内容
+router.get('/fileinfo', async (ctx) => {
+  const { cid, fid } = ctx.query;
+  try {
+    const result = await Files.getFileInfo(cid, fid);
+    if (!result) {
+      throw new Error('NOT FOUND');
+    }
+    ctx.end(200, result);
+  } catch (e) {
+    ctx.end(500, e.message);
+  }
+});
+
 // 生成随机频道秘钥
 router.get('/generatekey', async (ctx) => {
   const result = await Encrypt.generateKeyPair();
 
   ctx.end(200, {
-    publicKey: key2string(result.publicKey),
-    privateKey: key2string(result.privateKey),
+    publicKey: Encrypt.key2string(result.publicKey),
+    privateKey: Encrypt.key2string(result.privateKey),
   });
 });
 
@@ -97,10 +111,21 @@ router.post('/signpost', async (ctx) => {
 });
 
 // 发布文章，文章必须经过签名
-router.post('/publish', async (ctx) => {
+router.post('/publish-post', async (ctx) => {
   const { post, cid } = ctx.request.body;
   try {
     Posts.addPost(cid, post);
+    ctx.end(200, 'OK');
+  } catch (e) {
+    ctx.end(500, e.message);
+  }
+});
+
+// 发布文件，文件也必须经过签名
+router.post('/publish-file', async (ctx) => {
+  const { file, cid, path } = ctx.request.body;
+  try {
+    Files.publishFile(cid, file, path);
     ctx.end(200, 'OK');
   } catch (e) {
     ctx.end(500, e.message);
