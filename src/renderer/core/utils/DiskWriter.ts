@@ -13,7 +13,7 @@ export default class DiskWriter {
   public tasklist: ITask[];
   public fh: fs.FileHandle;
   public downloading: boolean = false;
-  
+
   public async open(filepath: string, filesize: number) {
     this.filepath = filepath;
     this.fh = await fs.open(filepath, 'a');
@@ -26,6 +26,7 @@ export default class DiskWriter {
     const task = this.tasklist.shift();
     if (!task) {
       this.downloading = false;
+
       return;
     }
 

@@ -2,14 +2,17 @@
 
 import Store from 'configstore';
 import * as R from 'ramda';
-import { generateChannelID, string2pubkey, verifyPublicKey } from '../encrypt';
+import { generateChannelID, string2pubkey, verifyPublicKey, string2prvkey } from '../encrypt';
 import { RequestType, IPostSummary } from '../types';
 import Peers from '../peers/Peers';
 import ObjectHash from 'object-hash';
 
 const store = new Store('proline-channel', {
+  cname: { }, // 频道名 [cid]
   subscribed: [ ], // 订阅频道列表
+  publish: [ ], // 创建的频道 [cid]
   publickey: { }, // 公钥
+  privatekey: { }, // 私钥 [cid]
   postlist: { }, // 文章列表
 });
 
@@ -55,7 +58,7 @@ export const getSubscribedList = (): string[] => {
  * 订阅频道
  * @param {string} cid 频道 id
  */
-export const subscribe = async (cid: string) => {
+export const subscribe = async (cid: string, cname: string) => {
   const publickey = await getPublicKey(cid);
   if (!publickey) {
     throw new Error('Failed to fetch public key');
@@ -64,6 +67,7 @@ export const subscribe = async (cid: string) => {
   const subscribed = getSubscribedList();
   const set = new Set(subscribed).add(cid);
   store.set('subscribed', Array.from(set));
+  store.set(`cname.${cid}`, cname);
 };
 
 /**
@@ -119,4 +123,35 @@ export const modifyPostList = (cid: string, fn: (t: IPostSummary[]) => IPostSumm
   const data: IPostSummary[] = store.get(`postlist.${cid}`);
   const result = fn(data);
   store.set(`postlist.${cid}`, result);
+};
+
+/**
+ * 获取频道名称
+ */
+export const getChannelName = (cid: string): string => {
+  return store.get(`cname.${cid}`) || 'Unnamed Channel';
+};
+
+/**
+ * 获取发布频道列表
+ */
+export const getCreatedChannelList = (): string[] => {
+  return store.get('publish');
+};
+
+/**
+ * 注册新的私钥
+ */
+export const registerPrivateKey = (cid: string, privateKey: string) => {
+  store.set(`privatekey.${cid}`, privateKey);
+  const publish = store.get('publish') as string[];
+  publish.push(cid);
+  store.set('publish', publish);
+};
+
+/**
+ * 获取私钥
+ */
+export const getPrivateKey = (cid: string) => {
+  return string2prvkey(store.get(`privatekey.${cid}`));
 };

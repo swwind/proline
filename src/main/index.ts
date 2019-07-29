@@ -1,3 +1,5 @@
+// 对，没错，这里什么都没有
+// 这只是一个驱动 Electron 的代码
 
 import { BrowserWindow, app } from 'electron';
 
@@ -6,20 +8,15 @@ const winURL = process.env.NODE_ENV !== 'production'
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`;
 
-/**
- * create window
- */
-function createWindow() {
+const createWindow = () => {
 
-  /**
-   * Initial window options
-   */
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
     width: 1000,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      webSecurity: false
     }
   });
 
@@ -28,7 +25,7 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-}
+};
 
 app.on('ready', createWindow);
 
@@ -43,24 +40,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-// import { autoUpdater } from 'electron-updater'
-// autoUpdater.on('update-downloaded', () => {
-// autoUpdater.quitAndInstall()
-// })
-// app.on('ready', () => {
-// if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-// })
-
-import './backend';
-
-// import omelet from './omelet';
-// omelet('47.103.116.110:23333');

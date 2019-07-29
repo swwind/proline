@@ -54,10 +54,10 @@
 </template>
 
 <script lang="ts">
-import { getCreatedChannelList, getChannelName } from '../../backend';
+import * as Channels from '../../core/posts/Channels';
 import Vue from 'vue';
 
-interface IChannelSimpleInfo {
+interface ISimpleChannelInfo {
   cid: string;
   cname: string;
 }
@@ -67,18 +67,18 @@ export default Vue.extend({
   data() {
     return {
       error: 'Loading...',
-      chans: [] as IChannelSimpleInfo[],
+      chans: [] as ISimpleChannelInfo[],
     };
   },
   async mounted() {
-    const originChans = await getCreatedChannelList();
+    const originChans = Channels.getCreatedChannelList();
     if (!originChans) {
       this.error = 'An Error occurred';
 
       return;
     }
     const chans = originChans.map((cid) => ({
-      cid, cname: getChannelName(cid)
+      cid, cname: Channels.getChannelName(cid)
     }));
 
     this.error = '';

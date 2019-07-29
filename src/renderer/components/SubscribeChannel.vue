@@ -36,8 +36,9 @@
 </template>
 
 <script lang="ts">
-import { subscribeChannel, getSubscribedChannelList } from '../backend';
+import * as Channels from '../core/posts/Channels';
 import Vue from 'vue';
+import * as R from 'ramda';
 
 export default Vue.extend({
   name: 'SubscribeChan',
@@ -63,12 +64,11 @@ export default Vue.extend({
       this.disable = true;
 
       try {
-        const chanlist = await getSubscribedChannelList();
-        if (chanlist.indexOf(cid) > -1) {
+        const chanlist = Channels.getSubscribedList();
+        if (R.contains(cid, chanlist)) {
           throw new Error('Channel Already Subscribed');
         }
-        await subscribeChannel(cid, cname);
-        // success
+        await Channels.subscribe(cid, cname);
         window.location.href = `/#/chan/${cid}`;
       } catch (e) {
         this.error = e.message;

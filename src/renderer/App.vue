@@ -42,8 +42,12 @@
   </div>
 </template>
 
-<script>
-export default { name: 'ProlineFrontend' };
+<script lang="ts">
+import Vue from 'vue';
+
+export default Vue.extend({
+  name: 'ProlineFrontend',
+});
 </script>
 
 <style lang="scss">

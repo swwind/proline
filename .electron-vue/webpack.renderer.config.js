@@ -104,36 +104,23 @@ module.exports = (env, argv) => {
           ? path.resolve(__dirname, '../node_modules')
           : false
       }),
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.NoEmitOnErrorsPlugin()
     ],
     output: {
       filename: '[name].js',
-      path: path.join(__dirname, '../dist')
+      path: path.join(__dirname, '../dist'),
     },
     resolve: {
       alias: {
         '@': path.join(__dirname, '../src/renderer'),
         'vue$': 'vue/dist/vue.esm.js'
       },
-      extensions: ['.js', '.vue', '.json', '.css', '.node', '.ts']
+      extensions: ['.js', '.vue', '.json', '.css', '.node', '.ts'],
     },
-    target: 'electron-renderer'
-  }
+    target: 'electron-renderer',
+  };
   
   /**
    * Adjust rendererConfig for development settings
-   */
-  if (argv.mode !== 'production') {
-    rendererConfig.plugins.push(
-      new webpack.DefinePlugin({
-        '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-      })
-    )
-  }
-  
-  /**
-   * Adjust rendererConfig for production settings
    */
   if (argv.mode === 'production') {
     rendererConfig.plugins.push(
@@ -143,7 +130,9 @@ module.exports = (env, argv) => {
           to: path.join(__dirname, '../dist/static')
         }
       ])
-    )
+    );
+  } else {
+    rendererConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
   }
 
   

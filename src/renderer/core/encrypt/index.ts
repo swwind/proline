@@ -14,6 +14,20 @@ export const md5 = (buffer: Buffer) => {
 };
 
 /**
+ * 生成随机字节
+ */
+export const randomBuffer = (length: number) => {
+  return crypto.randomBytes(length).toString('hex');
+};
+
+/**
+ * 文件片段的 hash
+ */
+export const filePieceHash = (buffer: Buffer) => {
+  return md5(buffer).slice(0, 16);
+};
+
+/**
  * 获得签名
  * @param {crypto.KeyObject} privateKey 私钥
  * @param {ISignObject} object 签名对象
@@ -22,8 +36,9 @@ export const signObject = <T extends ISignObject> (privateKey: crypto.KeyObject,
   const sign = crypto.createSign('SHA256');
   sign.update(hash(object, { excludeKeys: R.equals('signature') }));
   sign.end();
+  object.signature = sign.sign(privateKey, 'hex');
 
-  return sign.sign(privateKey, 'hex');
+  return object;
 };
 
 /**
@@ -100,7 +115,7 @@ export const verifySignature = <T extends ISignObject> (publicKey: crypto.KeyObj
 /**
  * 秘钥对
  */
-declare interface IKeyPair {
+export declare interface IKeyPair {
   publicKey: crypto.KeyObject;
   privateKey: crypto.KeyObject;
 }

@@ -90,19 +90,29 @@
 </template>
 
 <script lang="ts">
-import { getCreatedChannelList, getChannelName, getPrivateKey, signPost, publishPost, publishFile } from '../../backend';
+import * as Channels from '../../core/posts/Channels';
+import * as Posts from '../../core/posts/Posts';
+import * as Files from '../../core/posts/Files';
+import * as Encrypt from '../../core/encrypt';
+
 import marked from 'marked';
-import { toReadableSize, parseFile, randomID, extractSummaryFromFileInfo } from '../../utils';
+import { toReadableSize, extractSummaryFromFileInfo } from '../../utils';
 import { remote } from 'electron';
 import { promises as fs } from 'fs';
 import { basename } from 'path';
 import Vue from 'vue';
-import { IPostInfo } from '../../../core/types';
+
+interface ISimpleFileSummary {
+  name: string;
+  path: string;
+  size: number;
+}
 
 export default Vue.extend({
   name: 'WritePost',
   data() {
-    const chans = getCreatedChannelList().map((cid) => ({ cid, cname: getChannelName(cid) }));
+    const chans = Channels.getCreatedChannelList()
+      .map((cid) => ({ cid, cname: Channels.getChannelName(cid) }));
 
     return {
       cerror: chans.length
@@ -110,8 +120,8 @@ export default Vue.extend({
         : 'Please create a channel first.', // error on channel
       perror: '', // error on publish
       chans,
-      content: '# hello proline',
-      files: [] as { name: string; path: string; size: number }[],
+      content: '# hello proline\n\n**Markdown** is supported',
+      files: [] as ISimpleFileSummary[],
       waiting: false,
       select: chans[0] && chans[0].cid,
       title: '',
@@ -148,11 +158,12 @@ export default Vue.extend({
         });
       }));
     },
-    removeFile(file) {
+    removeFile(file: ISimpleFileSummary) {
       const set = new Set(this.files);
       set.delete(file);
       this.files = Array.from(set);
     },
+    // prepare to publish
     async applyPost() {
       this.waiting = true;
 
@@ -166,8 +177,8 @@ export default Vue.extend({
           throw new Error('You must provide title.');
         }
 
-        const pid = randomID(16);
-        const privateKey = getPrivateKey(cid);
+        const pid = Encrypt.randomBuffer(16);
+        const privateKey = Channels.getPrivateKey(cid);
 
         if (!privateKey) {
           throw new Error('Private key not found');
@@ -176,26 +187,24 @@ export default Vue.extend({
         this.perror = 'Processing files, please wait...';
 
         const fileinfos = await Promise.all(this.files.map(async (file) => {
-          const fileinfo = await signPost(await parseFile(file.path), privateKey);
-          await publishFile(cid, fileinfo, file.path);
+          const fileinfo = Encrypt.signObject(privateKey, await Files.parseFile(file.path));
+          await Files.publishFile(cid, fileinfo, file.path);
 
           return fileinfo;
         }));
 
         const files = fileinfos.map(extractSummaryFromFileInfo);
 
-        const _postinfo: IPostInfo = {
+        const postinfo = Encrypt.signObject(privateKey, {
           pid,
           title,
           content,
           files,
           pubtime: Date.now(),
           signature: '',
-        };
+        });
 
-        const postinfo = await signPost(_postinfo, privateKey);
-
-        await publishPost(cid, postinfo);
+        await Posts.addPost(cid, postinfo);
 
         // 跳转到文章页面
         window.location.href = `/#/post/${cid}/${pid}`;

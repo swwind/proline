@@ -56,11 +56,6 @@ export default Vue.extend({
   methods: {
     save(name: string) {
       store.set(name, this[name]);
-
-      if (name === 'expeer') {
-        const fuck = this.expeer;
-        
-      }
     }
   }
 });
@@ -93,23 +88,24 @@ export default Vue.extend({
       margin-right: 20px;
     }
   }
-}
-textarea {
-  width: 100%;
-  height: 200px;
-  padding: 10px;
-  font-size: 18px;
-  resize: none;
-  box-sizing: border-box;
-  background-color: #eeeeee;
-  border-radius: 5px;
-  border: 2px solid #eeeeee;
-  outline: none;
-  transition: all .3s;
 
-  &:focus {
-    border-color: #1479f7;
-    background-color: white;
+  textarea {
+    width: 100%;
+    height: 200px;
+    padding: 10px;
+    font-size: 18px;
+    resize: none;
+    box-sizing: border-box;
+    background-color: #eeeeee;
+    border-radius: 5px;
+    border: 2px solid #eeeeee;
+    outline: none;
+    transition: all .3s;
+
+    &:focus {
+      border-color: #1479f7;
+      background-color: white;
+    }
   }
 }
 

@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { getSubscribedChannelList, getChannelName } from '../backend';
+import * as Channels from '../core/posts/Channels';
 import Vue from 'vue';
 
 interface IChannelSimpleInfo {
@@ -65,11 +65,11 @@ export default Vue.extend({
   },
   async mounted() {
     try {
-      const cids = await getSubscribedChannelList();
+      const cids = Channels.getSubscribedList();
       const chans = cids.map((cid) => {
         return {
           cid,
-          cname: getChannelName(cid)
+          cname: Channels.getChannelName(cid)
         };
       });
       this.error = '';

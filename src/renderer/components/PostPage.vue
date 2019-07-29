@@ -43,12 +43,12 @@
 </template>
 
 <script lang="ts">
-import { getPostInfo, markPostRead } from '../backend';
+import * as Posts from '../core/posts/Posts';
 import marked from 'marked';
 import { toReadableSize } from '../utils';
 
 import Vue from 'vue';
-import { IPostInfo } from '../../core/types';
+import { IPostInfo } from '../core/types';
 
 export default Vue.extend({
   name: 'PostPage',
@@ -65,7 +65,7 @@ export default Vue.extend({
   },
   async mounted() {
     const { cid, pid } = this.$route.params;
-    const post = await getPostInfo(cid, pid);
+    const post = await Posts.getPostInfo(cid, pid);
     if (!post) {
       this.error = 'Please review this page a few moments later';
       this.title = 'Post not found';
@@ -74,7 +74,7 @@ export default Vue.extend({
       this.post = post;
       this.title = post.title;
 
-      markPostRead(cid, pid);
+      Posts.markPostRead(cid, pid);
     }
   },
   methods: {

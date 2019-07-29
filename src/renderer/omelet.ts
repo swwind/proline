@@ -5,7 +5,7 @@ import { createConnection, Socket } from 'net';
 import log from 'electron-log';
 import path from 'path';
 import * as R from 'ramda';
-import Peers from '../core/peers/Peers';
+import Peers from './core/peers/Peers';
 
 let child: ChildProcessWithoutNullStreams;
 let exit = false;
@@ -36,11 +36,12 @@ const spawnClient = (server: string) => {
       log.error(`[OMELET] Child exit with code=${code} signal=${signal}`);
     }
   });
+
   // child.stdout.on('data', (data) => {
-  //   log.log(data.toString().trim());
+  // log.log(data.toString().trim());
   // });
   // child.stderr.on('data', (data) => {
-  //   log.error(data.toString().trim());
+  // log.error(data.toString().trim());
   // });
 };
 

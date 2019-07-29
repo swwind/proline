@@ -46,7 +46,8 @@
 </template>
 
 <script lang="ts">
-import { getPostList, getChannelName, isPostRead } from '../backend';
+import * as Channels from '../core/posts/Channels';
+import * as Posts from '../core/posts/Posts';
 import Vue from 'vue';
 
 interface IPostSimpleInfo {
@@ -64,13 +65,13 @@ export default Vue.extend({
     return {
       cid,
       error: 'Loading...',
-      title: getChannelName(cid),
+      title: Channels.getChannelName(cid),
       posts: [] as IPostSimpleInfo[],
     };
   },
   async mounted() {
     const cid = this.$route.params.cid;
-    const originPost = await getPostList(cid);
+    const originPost = await Channels.getPostList(cid);
     if (!originPost) {
       this.error = 'An Error occurred';
 
@@ -80,7 +81,7 @@ export default Vue.extend({
     const posts = originPost.map((post) => {
       return {
         ...post,
-        read: isPostRead(cid, post.pid),
+        read: Posts.isPostRead(cid, post.pid),
       };
     });
 

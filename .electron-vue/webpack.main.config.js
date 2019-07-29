@@ -37,9 +37,7 @@ module.exports = (env, argv) => {
       filename: '[name].js',
       path: path.join(__dirname, '../dist')
     },
-    plugins: [
-      new webpack.NoEmitOnErrorsPlugin()
-    ],
+    plugins: [],
     resolve: {
       extensions: ['.js', '.json', '.ts']
     },
@@ -47,17 +45,6 @@ module.exports = (env, argv) => {
       __dirname: false
     },
     target: 'electron-main'
-  }
-  
-  /**
-   * Adjust mainConfig for development settings
-   */
-  if (argv.mode !== 'production') {
-    mainConfig.plugins.push(
-      new webpack.DefinePlugin({
-        '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-      })
-    )
   }
   
   /**

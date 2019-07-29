@@ -27,9 +27,9 @@
 </template>
 
 <script lang="ts">
-import { subscribeChannel, generateNewKey, registerPublicKey, registerPrivateKey, IKeyPair } from '../../backend';
-import md5 from 'md5';
 import Vue from 'vue';
+import * as Encrypt from '../../core/encrypt';
+import * as Channels from '../../core/posts/Channels';
 
 export default Vue.extend({
   name: 'CreateChan',
@@ -37,19 +37,17 @@ export default Vue.extend({
     return {
       error: '',
       cid: '',
-      keypair: null as IKeyPair | null,
+      keypair: null as Encrypt.IKeyPair | null,
       cname: '',
     };
   },
   async mounted() {
-    const keypair = await generateNewKey();
-    if (!keypair) {
-      this.error = 'Failed to generate a random key pair';
-
-      return;
+    try {
+      this.keypair = await Encrypt.generateKeyPair();
+      this.cid = Encrypt.generateChannelID(Encrypt.key2string(this.keypair.publicKey));
+    } catch (e) {
+      this.error = e.message;
     }
-    this.keypair = keypair;
-    this.cid = md5(Buffer.from(keypair.publicKey, 'hex'));
   },
   methods: {
     async createChannel() {
@@ -62,11 +60,11 @@ export default Vue.extend({
           throw new Error('Please wait while key pair generated');
         }
 
-        await registerPublicKey(this.keypair.publicKey);
-        await registerPrivateKey(this.cid, this.keypair.privateKey);
-        subscribeChannel(this.cid, this.cname);
+        await Channels.registerPublicKey(Encrypt.key2string(this.keypair.publicKey));
+        await Channels.registerPrivateKey(this.cid, Encrypt.key2string(this.keypair.privateKey));
+        await Channels.subscribe(this.cid, this.cname);
 
-        window.location.href = '/#/publish-home';
+        window.location.href = `/#/chan/${this.cid}`;
       } catch (e) {
         this.error = e.toString();
       }

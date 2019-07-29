@@ -7,7 +7,7 @@ import * as R from 'ramda';
 import { IFileInfo, RequestType } from '../types';
 import Peers from '../peers/Peers';
 import * as Channels from './Channels';
-import { verifySignature, md5 } from '../encrypt';
+import { verifySignature, md5, randomBuffer, filePieceHash } from '../encrypt';
 import DiskWriter from '../utils/DiskWriter';
 import Peer from '../peers/Peer';
 import log from 'electron-log';
@@ -38,7 +38,7 @@ const ssetFilePath = (cid: string, fid: string, data: string) => {
 };
 
 /**
- * 发布文件
+ * 发布文件，需要本地文件
  */
 export const publishFile = async (cid: string, fileinfo: IFileInfo, filepath: string) => {
   ssetFileInfo(cid, fileinfo.fid, fileinfo);
@@ -53,7 +53,7 @@ export const publishFile = async (cid: string, fileinfo: IFileInfo, filepath: st
  * @param {RequestType} online 获取方式
  * @returns {IFileInfo} 结果
  */
-export const getFileInfo = async (cid: string, fid: string, online: RequestType = 'both') => {
+export const getFileInfo = async (cid: string, fid: string, online: RequestType = 'both'): Promise<IFileInfo | undefined> => {
   const localData = sgetFileInfo(cid, fid);
 
   if (online === 'offline' || online === 'both' && localData) {
@@ -72,6 +72,20 @@ export const getFileInfo = async (cid: string, fid: string, online: RequestType 
   }
 
   return result;
+};
+
+export type FileStatus = 'DOWNLOADING' | 'NOTSTARTED' | 'FINISHED';
+
+export const getFileStatus = (cid: string, fid: string): FileStatus => {
+  const state = sgetPieceStatus(cid, fid);
+  if (state === true) {
+    return 'FINISHED';
+  }
+  if (Array.isArray(state)) {
+    return 'DOWNLOADING';
+  }
+
+  return 'NOTSTARTED';
 };
 
 /**
@@ -109,7 +123,7 @@ export const hasFile = async (cid: string, fid: string) => {
   }
 
   return true;
-}
+};
 
 /**
  * 获取文件片段，应该检查过 hasFile
@@ -117,14 +131,25 @@ export const hasFile = async (cid: string, fid: string) => {
 export const getFilePiece = async (cid: string, fid: string, index: number) => {
   const filepath = sgetFilePath(cid, fid);
   const fileinfo = sgetFileInfo(cid, fid);
+  if (!filepath || !fileinfo) {
+    throw new Error('Lack infomations');
+  }
   const fh = await fs.open(filepath, 'r');
   const length = index === fileinfo.pieces.length - 1
     ? fileinfo.size - fileinfo.psize * index
     : fileinfo.psize;
   const buffer = Buffer.alloc(length);
   await fh.read(buffer, 0, length, fileinfo.psize * index);
+
   return buffer;
-}
+};
+
+/**
+ * 返回文件保存路径
+ */
+export const getFilePath = (cid: string, fid: string) => {
+  return sgetFilePath(cid, fid);
+};
 
 /**
  * 对某个 Peer 进行下载
@@ -140,16 +165,19 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
   if (!fileinfo) {
     throw new Error('File info missing');
   }
+  if (!status) {
+    throw new Error('Piece state missing???');
+  }
 
   const lack = status
     .map((a, index): [boolean, number] => [a, index])
-    .filter(([a, _]) => !a)
-    .map(([_, i]) => i);
+    .filter(([a]) => !a)
+    .map(([, i]) => i);
 
   if (!lack.length) {
     ssetPieceStatus(cid, fid, true);
     await dw.close();
-    // TODO: Download finished
+
     return;
   }
 
@@ -170,7 +198,7 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
 
   download(cid, fid, pr, dw);
 
-}
+};
 
 /**
  * 开始下载文件。
@@ -202,4 +230,39 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
 
   // TODO: flush peer
 
+};
+
+
+/**
+ * 解析文件作为种子，没有签名
+ */
+export const parseFile = async (filepath): Promise<IFileInfo> => {
+  const stat = await fs.lstat(filepath);
+  if (!stat.isFile()) {
+    throw new Error('Directory or SymbolicLink is not supported');
+  }
+
+  const size = stat.size;
+  const psize = size > 1024 * 1024 * 1024
+    ? 4 * 1024 * 1024 // 4MB   if > 1G
+    : 256 * 1024; // 256KB if < 1G
+  const filename = path.basename(filepath);
+  const fid = randomBuffer(16);
+
+  // 计算每一段的 hash
+  const length = Math.floor((size - 1) / psize) + 1;
+  const filebuffer = await fs.readFile(filepath);
+  const pieces = await Promise.all(new Array(length).fill(0)
+    .map(async (_, index) => {
+      return filePieceHash(filebuffer.slice(index * psize, (index + 1) * psize));
+    }));
+
+  return {
+    fid,
+    filename,
+    size,
+    psize,
+    pieces,
+    signature: '',
+  };
 };

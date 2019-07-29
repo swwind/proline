@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import client from '../network/client';
+import client from '../p2p/client';
 import { IPostInfo, IPostSummary, IFileInfo } from '../types';
 
 // TODO: 记录回复，推测订阅的和没有订阅的
@@ -35,9 +35,9 @@ export default class Peer {
 
     if (result.status === 200) {
       return result.data;
-    } else {
-      throw new Error(result.data);
     }
+    throw new Error(result.data);
+
   }
 
   /**
@@ -48,9 +48,9 @@ export default class Peer {
 
     if (result.status === 200) {
       return result.data;
-    } else {
-      throw new Error(result.data);
     }
+    throw new Error(result.data);
+
   }
 
   /**
@@ -61,9 +61,9 @@ export default class Peer {
 
     if (result.status === 200) {
       return result.data;
-    } else {
-      throw new Error(result.data);
     }
+    throw new Error(result.data);
+
   }
 
   /**
@@ -74,9 +74,9 @@ export default class Peer {
 
     if (result.status === 200) {
       return result.data;
-    } else {
-      throw new Error(result.data);
     }
+    throw new Error(result.data);
+
   }
 
   /**
@@ -108,9 +108,9 @@ export default class Peer {
 
     if (result.status === 200) {
       return result.data;
-    } else {
-      throw new Error(result.data);
     }
+    throw new Error(result.data);
+
   }
 
 }
