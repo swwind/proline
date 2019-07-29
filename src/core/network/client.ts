@@ -12,9 +12,7 @@ export default (address: string, port: number) => {
     baseURL,
     timeout: 2000,
     maxRedirects: 0,
-    validateStatus(status) {
-      return status === 200;
-    }
+    validateStatus: () => true,
   });
 
   // 下面的真的需要吗？

@@ -57,6 +57,21 @@ router.get('/fileinfo', async (ctx) => {
   }
 });
 
+// 是否拥有文件可供下载
+// - cid
+// - fid
+router.get('/hasfile', async (ctx) => {
+  if (!ctx.query.cid || !ctx.query.fid) {
+    return ctx.end(400, 'BAD REQUEST');
+  }
+  const result = await Files.hasFile(ctx.query.cid, ctx.query.fid);
+  if (result) {
+    ctx.end(200, 'OK');
+  } else {
+    ctx.end(404, 'NOT FOUND');
+  }
+});
+
 // 获取文件片段
 // - cid
 // - fid
@@ -65,7 +80,13 @@ router.get('/filepiece', async (ctx) => {
   if (!ctx.query.cid || !ctx.query.fid || !ctx.query.index) {
     return ctx.end(400, 'BAD REQUEST');
   }
-  ctx.end(501, 'NOT FINISHED');
+
+  if (!await Files.hasFile(ctx.query.cid, ctx.query.fid)) {
+    return ctx.end(404, 'FILE NOT FOUND');
+  }
+
+  const buffer = await Files.getFilePiece(ctx.query.cid, ctx.query.fid, Number(ctx.query.index));
+  ctx.end(200, buffer);
 });
 
 // 获取公钥

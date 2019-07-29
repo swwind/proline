@@ -26,7 +26,7 @@ export default class Peers {
   }
 
   /**
-   * 全部执行
+   * 全部执行，忽略 ERROR
    */
   public static each<T>(fn: (pr: Peer) => Promise<T>) {
     const ps = Array.from(this.prs).map((pr) => {
@@ -39,19 +39,44 @@ export default class Peers {
     return Promise.all(ps);
   }
 
-  public static updateIPs(ips: Set<string>) {
+  /**
+   * 筛选出符合条件的 Peer
+   */
+  public static async filter(fn: (pr: Peer) => Promise<boolean>) {
+    const ps = await Promise.all(Array.from(this.prs).map(fn));
+
+    return Array.from(this.prs).filter((_, index) => ps[index]);
+  }
+
+  /**
+   * 获取拥有文件的 Peer
+   */
+  public static haveFile(cid: string, fid: string) {
+    return this.filter((pr) => pr.hasFile(cid, fid));
+  }
+
+  private static prmap: Map<string, Set<string>> = new Map();
+
+  /**
+   * 更新 Peer（从不同的源
+   */
+  public static updatePeers(partition: string, ips: Set<string>) {
+    const old = this.prmap.get(partition) || new Set();
+
     for (const ip of ips) {
-      if (!this.map.has(ip)) {
+      if (!old.has(ip)) {
         // 新人
         this.addPeer(ip);
       }
     }
-    for (const ip of this.map.keys()) {
+    for (const ip of old) {
       if (!ips.has(ip)) {
         // 离开
         this.removePeer(ip);
       }
     }
+
+    this.prmap.set(partition, ips);
   }
 
 }

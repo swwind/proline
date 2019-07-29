@@ -283,6 +283,41 @@ button, .real-button, .radius-button, .select {
   }
 }
 
+.input-checkbox {
+  all: unset;
+  display: inline-block;
+  background-color: #eeeeee;
+  width: 50px;
+  height: 20px;
+  border-radius: 20px;
+  position: relative;
+  transition: all .3s;
+  cursor: pointer;
+  vertical-align: middle;
+
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    background-color: #cccccc;
+    border-radius: 20px;
+    top: -2.5px;
+    left: -2.5px;
+    transition: all .2s;
+  }
+
+  &:checked {
+    background-color: #00da24;
+
+    &::after {
+      left: 27.5px;
+      background-color: #019d01;
+    }
+  }
+}
+
 .setsumei {
   margin: 20px 0;
   font-size: 18px;

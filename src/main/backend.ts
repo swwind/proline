@@ -132,6 +132,19 @@ router.post('/publish-file', async (ctx) => {
   }
 });
 
+// 获取文章情况
+// type FileStatus = 'downloading' | 'not-started' | 'finished' | 'paused';
+router.get('/filestatus', async (ctx) => {
+  const { cid, fid } = ctx.request.body;
+  if (Files.finished(cid, fid)) {
+    return ctx.end(200, 'finished');
+  }
+  if (Files.started(cid, fid)) {
+    return ctx.end(200, 'downloading');
+  }
+  return ctx.end(200, 'not-started');
+});
+
 app.use(async (ctx, next) => {
   ctx.end = (status, msg) => {
     ctx.response.status = status;

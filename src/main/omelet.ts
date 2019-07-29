@@ -24,7 +24,7 @@ const spawnClient = (server: string) => {
   ]);
 
   if (!child) {
-    return log.error('client file not found');
+    return log.error('[OMELET] client file not found');
   }
 
   child.on('exit', (code, signal) => {
@@ -33,7 +33,7 @@ const spawnClient = (server: string) => {
       setTimeout(() => {
         spawnClient(server);
       }, 1000);
-      log.error(`Child exit with code=${code} signal=${signal}`);
+      log.error(`[OMELET] Child exit with code=${code} signal=${signal}`);
     }
   });
   // child.stdout.on('data', (data) => {
@@ -86,33 +86,33 @@ const createClient = (server: string) => {
           // 发送虚拟地址
           const list = data.slice(4, length);
           if (list.length % 4 > 0) {
-            return log.error('Recieved broken packet');
+            return log.error('[OMELET] Recieved broken packet');
           }
           const ips = R.splitEvery(8, list.toString('hex')).map((v) => {
             return Buffer.from(v, 'hex').join('.');
           });
           const ipset = new Set(ips);
           ipset.delete(localip);
-          Peers.updateIPs(ipset);
+          Peers.updatePeers('SERVER', ipset);
           setTimeout(() => {
             socket.write(Buffer.from('d3880400', 'hex'));
           }, 15000);
           break;
         }
         default: {
-          log.error('Recieved an unknown packet');
+          log.error('[OMELET] Recieved an unknown packet');
           log.error(data);
         }
       }
     });
     socket.on('error', (e) => {
-      log.error('Socket Error');
+      log.error('[OMELET] Socket Error');
       log.error(e);
     });
     socket.on('end', () => {
-      log.log('Socket ended');
+      log.log('[OMELET] Socket ended');
     });
-    log.log(`Socket started with port: ${localport}`);
+    log.log(`[OMELET] Socket started with port: ${localport}`);
   }, 5000);
 
 };

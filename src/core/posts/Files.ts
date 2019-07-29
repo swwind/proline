@@ -1,13 +1,16 @@
 // 管理文件操作 (+fid)
 
 import Store from 'configstore';
-import { promises as fs } from 'fs';
+import { promises as fs, constants as fsconst } from 'fs';
 import path from 'path';
 import * as R from 'ramda';
 import { IFileInfo, RequestType } from '../types';
 import Peers from '../peers/Peers';
 import * as Channels from './Channels';
-import { verifySignature } from '../encrypt';
+import { verifySignature, md5 } from '../encrypt';
+import DiskWriter from '../utils/DiskWriter';
+import Peer from '../peers/Peer';
+import log from 'electron-log';
 
 const store = new Store('proline-files', {
   filepath: { }, // 文件本地地址 [cid][fid]
@@ -15,9 +18,32 @@ const store = new Store('proline-files', {
   fileinfo: { }, // 文件信息（种子） [cid][fid]
 });
 
+const sgetPieceStatus = (cid: string, fid: string): boolean[] | true | undefined => {
+  return store.get(`pieces.${cid}.${fid}`);
+};
+const sgetFileInfo = (cid: string, fid: string): IFileInfo | undefined => {
+  return store.get(`fileinfo.${cid}.${fid}`);
+};
+const sgetFilePath = (cid: string, fid: string): string | undefined => {
+  return store.get(`filepath.${cid}.${fid}`);
+};
+const ssetPieceStatus = (cid: string, fid: string, data: boolean[] | true) => {
+  return store.set(`pieces.${cid}.${fid}`, data);
+};
+const ssetFileInfo = (cid: string, fid: string, data: IFileInfo) => {
+  return store.set(`fileinfo.${cid}.${fid}`, data);
+};
+const ssetFilePath = (cid: string, fid: string, data: string) => {
+  return store.set(`filepath.${cid}.${fid}`, data);
+};
+
+/**
+ * 发布文件
+ */
 export const publishFile = async (cid: string, fileinfo: IFileInfo, filepath: string) => {
-  store.set(`fileinfo.${cid}.${fileinfo.fid}`, fileinfo);
-  store.set(`filepath.${cid}.${fileinfo.fid}`, filepath);
+  ssetFileInfo(cid, fileinfo.fid, fileinfo);
+  ssetFilePath(cid, fileinfo.fid, filepath);
+  ssetPieceStatus(cid, fileinfo.fid, true);
 };
 
 /**
@@ -28,7 +54,7 @@ export const publishFile = async (cid: string, fileinfo: IFileInfo, filepath: st
  * @returns {IFileInfo} 结果
  */
 export const getFileInfo = async (cid: string, fid: string, online: RequestType = 'both') => {
-  const localData: IFileInfo = store.get(`fileinfo.${cid}.${fid}`);
+  const localData = sgetFileInfo(cid, fid);
 
   if (online === 'offline' || online === 'both' && localData) {
     return localData;
@@ -42,7 +68,7 @@ export const getFileInfo = async (cid: string, fid: string, online: RequestType 
 
   const result = R.find(verifySignature(publickey), fres);
   if (result) {
-    store.set(`fileinfo.${cid}.${fid}`, result);
+    ssetFileInfo(cid, fid, result);
   }
 
   return result;
@@ -52,7 +78,7 @@ export const getFileInfo = async (cid: string, fid: string, online: RequestType 
  * 是否完成
  */
 export const finished = (cid: string, fid: string) => {
-  const result = store.get(`pieces.${cid}.${fid}`);
+  const result = sgetPieceStatus(cid, fid);
 
   return result === true;
 };
@@ -61,21 +87,90 @@ export const finished = (cid: string, fid: string) => {
  * 是否在下载中
  */
 export const started = (cid: string, fid: string) => {
-  const result = store.get(`pieces.${cid}.${fid}`);
+  const result = sgetPieceStatus(cid, fid);
 
   return Array.isArray(result);
 };
 
 /**
- * 创建空白文件
+ * 文件是否可供下载
  */
-const alloc = async (filepath: string, filesize: number) => {
+export const hasFile = async (cid: string, fid: string) => {
+  const filepath = sgetFilePath(cid, fid);
 
-  const handle = await fs.open(filepath, 'w');
-  await handle.truncate(filesize);
-  await handle.close();
+  if (!filepath) {
+    return false;
+  }
 
-};
+  try {
+    await fs.access(filepath, fsconst.F_OK | fsconst.R_OK);
+  } catch (e) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * 获取文件片段，应该检查过 hasFile
+ */
+export const getFilePiece = async (cid: string, fid: string, index: number) => {
+  const filepath = sgetFilePath(cid, fid);
+  const fileinfo = sgetFileInfo(cid, fid);
+  const fh = await fs.open(filepath, 'r');
+  const length = index === fileinfo.pieces.length - 1
+    ? fileinfo.size - fileinfo.psize * index
+    : fileinfo.psize;
+  const buffer = Buffer.alloc(length);
+  await fh.read(buffer, 0, length, fileinfo.psize * index);
+  return buffer;
+}
+
+/**
+ * 对某个 Peer 进行下载
+ */
+const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
+  const status = sgetPieceStatus(cid, fid);
+  const fileinfo = sgetFileInfo(cid, fid);
+  if (status === true) {
+    // finished
+    return;
+  }
+
+  if (!fileinfo) {
+    throw new Error('File info missing');
+  }
+
+  const lack = status
+    .map((a, index): [boolean, number] => [a, index])
+    .filter(([a, _]) => !a)
+    .map(([_, i]) => i);
+
+  if (!lack.length) {
+    ssetPieceStatus(cid, fid, true);
+    await dw.close();
+    // TODO: Download finished
+    return;
+  }
+
+  // 下载
+  const piece = lack[Math.floor(Math.random() * lack.length)];
+  try {
+    const buffer = await pr.queryFilePiece(cid, fid, piece);
+    if (finished(cid, fid)) {
+      return;
+    }
+    if (md5(buffer).slice(0, 16) !== fileinfo.pieces[piece]) {
+      throw new Error(`Piece failed hash check: ${cid}/${fid}[${piece}]`);
+    }
+    await dw.write(buffer, fileinfo.psize * piece);
+  } catch (e) {
+    log.error(`Error while downloading piece ${cid}/${fid}[${piece}]: ${e.message}`);
+  }
+
+  download(cid, fid, pr, dw);
+
+}
 
 /**
  * 开始下载文件。
@@ -96,10 +191,15 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
   }
 
   const savepath = path.join(savedir, fileinfo.filename);
-  store.set(`filepath.${cid}.${fid}`, savepath);
+  ssetFilePath(cid, fid, savepath);
+  ssetPieceStatus(cid, fid, new Array(fileinfo.pieces.length).fill(false));
 
-  await alloc(savepath, fileinfo.size);
+  const dw = new DiskWriter();
+  await dw.open(savepath, fileinfo.size);
 
-  // TODO
+  const prs = await Peers.haveFile(cid, fid);
+  prs.forEach((pr) => download(cid, fid, pr, dw));
+
+  // TODO: flush peer
 
 };

@@ -19,8 +19,12 @@ export default class Peer {
   /**
    * 发送消息
    */
-  public message(message: string) {
-    return this.axios.post('/message', { message });
+  public async message(message: string) {
+    const response = await this.axios.post('/message', { message });
+
+    if (response.status !== 200) {
+      throw new Error(response.data);
+    }
   }
 
   /**
@@ -29,7 +33,11 @@ export default class Peer {
   public async queryFileInfo(cid: string, fid: string): Promise<IFileInfo> {
     const result = await this.axios.get('/fileinfo', { params: { cid, fid } });
 
-    return result.data;
+    if (result.status === 200) {
+      return result.data;
+    } else {
+      throw new Error(result.data);
+    }
   }
 
   /**
@@ -38,7 +46,11 @@ export default class Peer {
   public async queryPostList(cid: string): Promise<IPostSummary[]> {
     const result = await this.axios.get(`/postlist?cid=${cid}`);
 
-    return result.data;
+    if (result.status === 200) {
+      return result.data;
+    } else {
+      throw new Error(result.data);
+    }
   }
 
   /**
@@ -47,7 +59,11 @@ export default class Peer {
   public async queryPostInfo(cid: string, pid: string): Promise<IPostInfo> {
     const result = await this.axios.get(`/postinfo?cid=${cid}&pid=${pid}`);
 
-    return result.data;
+    if (result.status === 200) {
+      return result.data;
+    } else {
+      throw new Error(result.data);
+    }
   }
 
   /**
@@ -56,14 +72,45 @@ export default class Peer {
   public async queryPublicKey(cid: string): Promise<string> {
     const result = await this.axios.get(`/publickey?cid=${cid}`);
 
-    return result.data;
+    if (result.status === 200) {
+      return result.data;
+    } else {
+      throw new Error(result.data);
+    }
   }
 
   /**
    * 推送更新
    */
-  public pushUpdate(cid: string, post: IPostInfo) {
-    return this.axios.post('/pushpost', { cid, post });
+  public async pushUpdate(cid: string, post: IPostInfo) {
+    const response = await this.axios.post('/pushpost', { cid, post });
+
+    if (response.status !== 200) {
+      throw new Error(response.data);
+    }
+  }
+
+  /**
+   * 询问是否有文件，不抛出异常
+   */
+  public async hasFile(cid: string, fid: string) {
+    const response = await this.axios.get('/hasfile', { params: { cid, fid } });
+
+    return response.status === 200;
+  }
+
+
+  /**
+   * 获取文件片段，不做检查
+   */
+  public async queryFilePiece(cid: string, fid: string, index: number): Promise<Buffer> {
+    const result = await this.axios.get('/file-piece', { params: { cid, fid, index } });
+
+    if (result.status === 200) {
+      return result.data;
+    } else {
+      throw new Error(result.data);
+    }
   }
 
 }

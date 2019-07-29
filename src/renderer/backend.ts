@@ -65,7 +65,7 @@ export const getFileInfo = async (cid: string, fid: string): Promise<IFileInfo> 
 
 type FileStatus = 'downloading' | 'not-started' | 'finished' | 'paused';
 
-// FIXME: 未完成的 API
+// 获取文章下载情况
 export const getFileStatus = async (cid: string, fid: string): Promise<FileStatus> => {
   const response = await axs.get('/filestatus', { params: { cid, fid } });
 

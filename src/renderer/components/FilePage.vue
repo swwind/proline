@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getFileInfo } from '../backend';
+import { getFileInfo, getFileStatus } from '../backend';
 import { IFileInfo } from '../../core/types';
 
 export default Vue.extend({
@@ -41,6 +41,8 @@ export default Vue.extend({
   async mounted() {
     const fileinfo = await getFileInfo(this.cid, this.fid);
     this.file = fileinfo;
+    const filestate = await getFileStatus(this.cid, this.fid);
+
     this.loading = false;
   }
 });
