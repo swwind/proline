@@ -1,5 +1,8 @@
 <template>
-  <div id="app" :data-theme="theme">
+  <div
+    id="app"
+    :data-theme="theme"
+  >
     <div class="container">
       <transition name="slide-fade">
         <router-view />
