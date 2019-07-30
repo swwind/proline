@@ -242,7 +242,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .error {
-  color: red;
+  color: var(--red-color);
   margin: 20px 0;
 }
 
@@ -251,18 +251,19 @@ export default Vue.extend({
   line-height: 200px;
   text-align: center;
   font-size: 25px;
-  border: 2px dashed #eeeeee;
-  color: #666;
+  border: 2px dashed var(--level-2-color);
+  color: var(--level-2-color);
   cursor: pointer;
+  border-radius: 5px;
 }
 
 
 .markdown-editor {
   margin: 20px 0;
   height: 500px;
-  border: 2px solid #eeeeee;
+  border: 2px solid var(--level-3-color);
   border-radius: 5px;
-  color: #333;
+  color: var(--main-color);
   display: flex;
 
   textarea, .preview {
@@ -272,10 +273,11 @@ export default Vue.extend({
   }
 
   textarea {
+    color: var(--main-color);
     border: none;
     resize: none;
     outline: none;
-    background-color: #f6f6f6;
+    background-color: var(--level-3-color);
     font-size: 16px;
     font-family: 'Monaco', courier, monospace;
     padding: 20px;

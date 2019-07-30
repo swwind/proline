@@ -82,7 +82,7 @@ export default Vue.extend({
 
 <style>
 .error {
-  color: red;
+  color: var(--red-color);
   height: 20px;
 }
 </style>

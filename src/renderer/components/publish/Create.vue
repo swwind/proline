@@ -75,6 +75,6 @@ export default Vue.extend({
 
 <style>
 .error {
-  color: red;
+  color: var(--red-color);
 }
 </style>

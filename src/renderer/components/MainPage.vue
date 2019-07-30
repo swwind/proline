@@ -85,7 +85,7 @@ export default Vue.extend({
 <style>
 
 .time, .id {
-  color: #666666;
+  color: var(--level-2-color);
 }
 
 </style>

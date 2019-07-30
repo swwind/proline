@@ -10,7 +10,7 @@
       </div>
       <textarea
         v-model="expeer"
-        @input="save('expeer')"
+        @change="save('expeer')"
       />
     </div>
     <div class="block">
@@ -21,7 +21,7 @@
           v-model="darktheme"
           class="input-checkbox"
           type="checkbox"
-          @change="save('darktheme')"
+          @change="saveTheme()"
         >
       </div>
     </div>
@@ -30,32 +30,19 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
-import Store from 'configstore';
-
-interface IConfig {
-  expeer: string;
-  darktheme: boolean;
-}
-
-const deft: IConfig = {
-  expeer: '',
-  darktheme: false,
-};
-
-const store = new Store('proline-settings', deft);
+import * as Config from '../core/posts/Config';
 
 export default Vue.extend({
   name: 'Settings',
   data() {
-    return Object.assign(deft, store.all as IConfig);
+    return Config.getConfig();
   },
   async mounted() {
     // do nothing
   },
   methods: {
-    save(name: string) {
-      store.set(name, this[name]);
+    saveTheme() {
+      Config.changeTheme(this.darktheme);
     }
   }
 });
@@ -65,7 +52,7 @@ export default Vue.extend({
 <style lang="scss">
 .block {
   padding: 20px 0;
-  border-bottom: 2px solid #eeeeee;
+  border-bottom: 2px solid var(--level-2-color);
 
   &:last-child {
     border-bottom: none;
@@ -96,15 +83,15 @@ export default Vue.extend({
     font-size: 18px;
     resize: none;
     box-sizing: border-box;
-    background-color: #eeeeee;
+    background-color: var(--level-3-color);
     border-radius: 5px;
-    border: 2px solid #eeeeee;
+    border: 2px solid var(--level-3-color);
     outline: none;
     transition: all .3s;
 
     &:focus {
-      border-color: #1479f7;
-      background-color: white;
+      border-color: var(--theme-color);
+      background-color: var(--background-color);
     }
   }
 }

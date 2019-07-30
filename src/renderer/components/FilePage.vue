@@ -103,5 +103,7 @@ export default Vue.extend({
   max-width: 1000px;
   display: block;
   margin: 20px 0;
+  border: none;
+  outline: none;
 }
 </style>

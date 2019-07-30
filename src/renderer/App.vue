@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :data-theme="theme">
     <div class="container">
       <transition name="slide-fade">
         <router-view />
@@ -44,13 +44,28 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import * as Config from './core/posts/Config';
 
 export default Vue.extend({
   name: 'ProlineFrontend',
+  data() {
+    const config = Config.getConfig();
+
+    return {
+      theme: config.darktheme ? 'dark' : 'light',
+    };
+  },
+  async mounted() {
+    Config.handleUpdate((config) => {
+      this.theme = config.darktheme ? 'dark' : 'light';
+    });
+  }
 });
 </script>
 
 <style lang="scss">
+
+@import url('./css/theme.scss');
 
 body, html {
   margin: 0;
@@ -63,7 +78,7 @@ body, html {
   height: 75px;
   width: 75px;
   text-align: center;
-  color: white;
+  color: var(--sidebar-item-color);
   transition: background-color .5s;
 
   .icon {
@@ -72,7 +87,7 @@ body, html {
   }
 
   &:hover {
-    background-color: rgba(255, 255, 255, .2);
+    background-color: var(--half-transparent);
   }
 }
 
@@ -80,6 +95,8 @@ body, html {
   display: block;
   height: 100vh;
   width: 100vw;
+  background-color: var(--background-color);
+  color: var(--main-color);
   overflow: hidden;
 }
 
@@ -101,7 +118,7 @@ body, html {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #1479f7;
+  background-color: var(--sidebar-color);
   transition: background-color 1s;
   animation: start-animation 1s;
   animation-delay: 1s;
@@ -116,7 +133,7 @@ body, html {
   height: 100px;
   width: 100%;
   line-height: 100px;
-  color: white;
+  color: var(--sidebar-item-color);
   text-align: center;
   font-size: 100px;
   animation: fade-out 1s;
@@ -152,7 +169,7 @@ h3, .h3 {
   top: 0;
   height: 100vh;
   width: 75px;
-  background-color: #1479f7;
+  background-color: var(--sidebar-color);
 }
 
 .container {
@@ -175,12 +192,12 @@ h3, .h3 {
 
   .nothing, .loading {
     text-align: center;
-    color: grey;
+    color: var(--level-2-color);
   }
 
   .item {
     display: block;
-    color: black;
+    color: var(--main-color);
     text-decoration: none;
     padding: 20px;
     transition: background-color .2s;
@@ -190,7 +207,7 @@ h3, .h3 {
     border-radius: 5px;
 
     &:hover {
-      background-color: rgba(0, 0, 0, .05);
+      background-color: var(--level-3-color);
     }
   }
 
@@ -200,62 +217,62 @@ h3, .h3 {
 }
 
 button, .real-button, .radius-button, .select {
-  background-color: #eeeeee;
+  background-color: var(--level-3-color);
   padding: 10px 20px;
   border-radius: 5px;
-  border: 2px solid #eeeeee;
+  border: 2px solid var(--level-3-color);
   outline: none;
   transition: all .3s;
   cursor: pointer;
   font-size: 18px;
   margin: 10px 20px 10px 0;
   text-decoration: none;
-  color: black;
+  color: var(--main-color);
 
   &:hover {
-    color: black;
-    background-color: white;
-    border: 2px solid #1479f7;
+    color: var(--main-color);
+    background-color: var(--background-color);
+    border: 2px solid var(--theme-color);
   }
 
   &:focus {
-    border: 2px solid #1479f7;
+    border: 2px solid var(--theme-color);
   }
 
   &:disabled {
-    color: #666;
-    border: 2px solid #eeeeee;
-    background-color: #eeeeee;
+    color: var(--disable-color);
+    border: 2px solid var(--level-3-color);
+    background-color: var(--level-3-color);
     cursor: not-allowed;
   }
 
   &.green {
-    color: white;
-    background-color: #00da24;
-    border-color: #00da24;
+    color: var(--background-color);
+    background-color: var(--green-color);
+    border-color: var(--green-color);
 
     &:hover, &:focus {
-      background-color: #eeeeee;
-      color: #00da24;
+      background-color: var(--level-3-color);
+      color: var(--green-color);
     }
   }
 
   &.red {
-    color: white;
-    background-color: #ce0707;
-    border-color: #ce0707;
+    color: var(--background-color);
+    background-color: var(--red-color);
+    border-color: var(--red-color);
 
     &:hover, &:focus {
-      background-color: #eeeeee;
-      color: #ce0707;
+      background-color: var(--level-3-color);
+      color: var(--red-color);
     }
   }
 
   &.green, &.red {
     &:disabled {
-      color: #666;
-      border: 2px solid #eeeeee;
-      background-color: #eeeeee;
+      color: var(--disable-color);
+      border: 2px solid var(--level-3-color);
+      background-color: var(--level-3-color);
       cursor: not-allowed;
     }
   }
@@ -271,26 +288,28 @@ button, .real-button, .radius-button, .select {
   font-size: 18px;
   padding: 10px;
   border-radius: 5px;
-  border: 2px solid #eeeeee;
+  border: 2px solid var(--level-3-color);
   outline: none;
   width: 100%;
   box-sizing: border-box;
   margin: 10px 0;
   transition: all .3s;
+  background-color: var(--background-color);
+  color: var(--main-color);
 
   &:hover {
-    border-color: #cccccc;
+    border-color: var(--level-1-color);
   }
 
   &:focus {
-    border-color: #1479f7;
+    border-color: var(--theme-color);
   }
 }
 
 .input-checkbox {
   all: unset;
   display: inline-block;
-  background-color: #eeeeee;
+  background-color: var(--level-3-color);
   width: 50px;
   height: 20px;
   border-radius: 20px;
@@ -305,7 +324,7 @@ button, .real-button, .radius-button, .select {
     width: 25px;
     height: 25px;
     position: absolute;
-    background-color: #cccccc;
+    background-color: var(--level-1-color);
     border-radius: 20px;
     top: -2.5px;
     left: -2.5px;
@@ -313,11 +332,11 @@ button, .real-button, .radius-button, .select {
   }
 
   &:checked {
-    background-color: #00da24;
+    background-color: var(--green-color);
 
     &::after {
       left: 27.5px;
-      background-color: #019d01;
+      background-color: var(--dark-green-color);
     }
   }
 }
