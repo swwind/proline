@@ -15,7 +15,7 @@ A decentrialized post subscriber and file downloader.
 - [ ] file downloading
 - [x] post publishing
 - [ ] mime and protocol
-- [ ] set night theme
+- [x] dark mode
 - [ ] p2p instant message
 
 ## Development
