@@ -28,8 +28,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import * as Encrypt from '../../core/encrypt';
-import * as Channels from '../../core/posts/Channels';
+import * as Encrypt from '../../../encrypt';
+import { main } from '../../backend';
+const { Channels } = main;
 
 export default Vue.extend({
   name: 'CreateChan',

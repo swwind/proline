@@ -1,9 +1,9 @@
 // 保存文章内容以及文章的操作 (+pid)
 
 import Store from 'configstore';
-import { IPostInfo, IPostSummary, RequestType } from '../types';
+import { IPostInfo, IPostSummary, RequestType } from '../../types';
 import Peers from '../peers/Peers';
-import { verifySignature } from '../encrypt';
+import { verifySignature, string2pubkey } from '../../encrypt';
 import * as R from 'ramda';
 import * as Channels from './Channels';
 
@@ -27,7 +27,7 @@ export const getPostInfo = async (cid: string, pid: string, online: RequestType 
   }
 
   const fres = await Peers.each((pr) => pr.queryPostInfo(cid, pid));
-  const publickey = await Channels.getPublicKey(cid, online);
+  const publickey = string2pubkey(await Channels.getPublicKey(cid, online));
   if (!publickey) {
     throw new Error('Public key not found');
   }
@@ -47,7 +47,7 @@ export const getPostInfo = async (cid: string, pid: string, online: RequestType 
  * @param {IPostInfo} post 文章 info
  */
 export const addPost = async (cid: string, post: IPostInfo) => {
-  const publickey = await Channels.getPublicKey(cid);
+  const publickey = string2pubkey(await Channels.getPublicKey(cid));
   if (!publickey) {
     throw new Error('Public key not found');
   }

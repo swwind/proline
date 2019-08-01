@@ -28,11 +28,11 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.scss$/,
-          use: ['vue-style-loader', 'css-loader', 'sass-loader']
+          use: ['vue-style-loader', 'css-loader', 'postcss-loader', 'sass-loader']
         },
         {
           test: /\.css$/,
-          use: ['vue-style-loader', 'css-loader']
+          use: ['vue-style-loader', 'css-loader', 'postcss-loader']
         },
         {
           test: /\.html$/,

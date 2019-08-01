@@ -36,7 +36,8 @@
 </template>
 
 <script lang="ts">
-import * as Channels from '../core/posts/Channels';
+import { main } from '../backend';
+const { Channels } = main;
 import Vue from 'vue';
 import * as R from 'ramda';
 

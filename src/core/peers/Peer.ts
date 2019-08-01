@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import client from '../p2p/client';
-import { IPostInfo, IPostSummary, IFileInfo } from '../types';
+import { IPostInfo, IPostSummary, IFileInfo } from '../../types';
 
 // TODO: 记录回复，推测订阅的和没有订阅的
 

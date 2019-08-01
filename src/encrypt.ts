@@ -1,7 +1,7 @@
 import * as hash from 'object-hash';
 import * as crypto from 'crypto';
 import * as R from 'ramda';
-import { ISignObject } from '../types';
+import { ISignObject } from './types';
 
 /**
  * 计算 md5
@@ -45,24 +45,28 @@ export const signObject = <T extends ISignObject> (privateKey: crypto.KeyObject,
  * 字符串转公钥
  * @param {string} publicKey 公钥
  */
-export const string2pubkey = (publicKey: string) => {
-  return crypto.createPublicKey({
-    key: Buffer.from(publicKey, 'hex'),
-    type: 'pkcs1',
-    format: 'der',
-  });
+export const string2pubkey = (publicKey: string | undefined) => {
+  if (publicKey) {
+    return crypto.createPublicKey({
+      key: Buffer.from(publicKey, 'hex'),
+      type: 'pkcs1',
+      format: 'der',
+    });
+  }
 };
 
 /**
  * 字符串转私钥
  * @param {string} privateKey 私钥
  */
-export const string2prvkey = (privateKey: string) => {
-  return crypto.createPrivateKey({
-    key: Buffer.from(privateKey, 'hex'),
-    type: 'pkcs1',
-    format: 'der',
-  });
+export const string2prvkey = (privateKey: string | undefined) => {
+  if (privateKey) {
+    return crypto.createPrivateKey({
+      key: Buffer.from(privateKey, 'hex'),
+      type: 'pkcs1',
+      format: 'der',
+    });
+  }
 };
 
 /**

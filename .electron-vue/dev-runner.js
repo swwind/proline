@@ -11,6 +11,7 @@ const webpackHotMiddleware = require('webpack-hot-middleware')
 
 const mainConfig = require('./webpack.main.config')(null, { mode: 'development' })
 const rendererConfig = require('./webpack.renderer.config')(null, { mode: 'development' })
+const coreConfig = require('./webpack.core.config');
 
 let electronProcess = null
 let manualRestart = false
@@ -32,13 +33,6 @@ const startRenderer = () => {
       heartbeat: 2500
     })
 
-    compiler.hooks.compilation.tap('compilation', compilation => {
-      compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
-        hotMiddleware.publish({ action: 'reload' })
-        cb()
-      })
-    })
-
     compiler.hooks.done.tap('done', stats => {
       logStats('Renderer', stats)
     })
@@ -53,7 +47,9 @@ const startRenderer = () => {
           ctx.middleware.waitUntilValid(() => {
             resolve()
           })
-        }
+        },
+        hot: false,
+        inline: false,
       }
     )
 
@@ -61,16 +57,16 @@ const startRenderer = () => {
   })
 }
 
-const startMain = () => {
+const startBackend = (title, config) => {
   return new Promise((resolve, reject) => {
-    mainConfig.mode = 'development'
-    const compiler = webpack(mainConfig)
+    config.mode = 'development';
+    const compiler = webpack(config);
 
     compiler.hooks.watchRun.tapAsync('watch-run', (compilation, done) => {
-      logStats('Main', chalk.white.bold('compiling...'))
+      logStats(title, chalk.white.bold('compiling...'))
       hotMiddleware.publish({ action: 'compiling' })
       done()
-    })
+    });
 
     compiler.watch({}, (err, stats) => {
       if (err) {
@@ -78,7 +74,7 @@ const startMain = () => {
         return
       }
 
-      logStats('Main', stats)
+      logStats(title, stats)
 
       if (electronProcess && electronProcess.kill) {
         manualRestart = true
@@ -125,11 +121,10 @@ const startElectron = () => {
 
 const init = async () => {
 
-  console.log('waiting...');
-
   await Promise.all([
     startRenderer(),
-    startMain(),
+    startBackend('Main', mainConfig),
+    startBackend('Core', coreConfig),
   ]);
   startElectron();
 }

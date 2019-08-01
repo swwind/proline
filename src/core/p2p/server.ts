@@ -6,7 +6,6 @@ import * as bodyRouter from 'koa-bodyparser';
 import * as Posts from '../posts/Posts';
 import * as Channels from '../posts/Channels';
 import * as Files from '../posts/Files';
-import { key2string } from '../encrypt';
 
 const api = new Koa();
 const router = new Router();
@@ -97,7 +96,7 @@ router.get('/publickey', async (ctx) => {
   }
   const result = await Channels.getPublicKey(ctx.query.cid, 'offline');
   if (result) {
-    ctx.end(200, key2string(result));
+    ctx.end(200, result);
   } else {
     ctx.end(404, 'NOT FOUND');
   }

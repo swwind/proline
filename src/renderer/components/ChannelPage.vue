@@ -46,8 +46,8 @@
 </template>
 
 <script lang="ts">
-import * as Channels from '../core/posts/Channels';
-import * as Posts from '../core/posts/Posts';
+import { main } from '../backend';
+const { Channels, Posts } = main;
 import Vue from 'vue';
 
 interface IPostSimpleInfo {

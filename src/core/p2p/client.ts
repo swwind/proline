@@ -15,16 +15,5 @@ export default (address: string, port: number) => {
     validateStatus: () => true,
   });
 
-  // 下面的真的需要吗？
-  // let token = '';
-  // axs.interceptors.request.use((config) => {
-  // if (token) {
-  // if (!config.headers) {
-  // config.headers = {};
-  // }
-  // config.headers['Authorization'] = token;
-  // }
-  // return config;
-  // });
   return axs;
 };

@@ -14,6 +14,20 @@
       <div class="setsumei">
         State: {{ state }}
       </div>
+      <div v-if="state === 'NOTSTARTED'">
+        <div
+          class="input-text folder"
+          @click="chooseFolder()"
+          v-text="folder"
+        />
+        <button
+          :disabled="!downloadok"
+          @click="download()"
+        >
+          <i class="icon">arrow_downward</i>
+          Download
+        </button>
+      </div>
       <video
         v-if="videourl"
         id="video"
@@ -21,6 +35,11 @@
         controls="controls"
         :src="videourl"
       />
+      <img
+        v-if="imageurl"
+        class="image"
+        :src="`file://${filepath}`"
+      >
       <button
         v-if="state === 'FINISHED'"
         @click="openFile()"
@@ -34,9 +53,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import * as Files from '../core/posts/Files';
-import { IFileInfo } from '../core/types';
-import { shell } from 'electron';
+import { main } from '../backend';
+const { Files } = main;
+import { IFileInfo } from '../../both/types';
+import { shell, remote } from 'electron';
 import flvjs from 'flv.js';
 
 export default Vue.extend({
@@ -52,6 +72,10 @@ export default Vue.extend({
       filepath: '',
       state: '',
       videourl: false as string | boolean,
+      imageurl: false,
+      savepath: '',
+      folder: 'Choose a folder...',
+      downloadok: false,
     };
   },
   async mounted() {
@@ -85,6 +109,9 @@ export default Vue.extend({
           flv.load();
         }, 0);
       }
+      if ((/\.(jpe?g|png|gif)$/i).test(fileinfo.filename)) {
+        this.imageurl = true;
+      }
     }
 
     this.loading = '';
@@ -92,18 +119,36 @@ export default Vue.extend({
   methods: {
     openFile() {
       shell.showItemInFolder(this.filepath);
+    },
+    chooseFolder() {
+      const result = remote.dialog.showOpenDialog({
+        properties: ['openDirectory'],
+      });
+      if (result) {
+        this.folder = result[0];
+        this.downloadok = true;
+      }
+    },
+    download() {
+      Files.startDownload(this.cid, this.fid, this.folder);
     }
   }
 });
 </script>
 
 <style>
-.video {
+.video, .image {
   width: 100%;
   max-width: 1000px;
   display: block;
   margin: 20px 0;
   border: none;
   outline: none;
+}
+
+.folder {
+  cursor: pointer;
+  user-select: none;
+  color: var(--level-1-color);
 }
 </style>

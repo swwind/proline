@@ -1,7 +1,10 @@
-// 对，没错，这里什么都没有
-// 这只是一个驱动 Electron 的代码
 
 import { BrowserWindow, app } from 'electron';
+
+// import { IMain } from '../types';
+// /* eslint-disable-next-line */
+// declare const __non_webpack_require__: Function;
+// const main: IMain = __non_webpack_require__('./core').default;
 
 let mainWindow;
 const winURL = process.env.NODE_ENV !== 'production'

@@ -90,13 +90,12 @@
 </template>
 
 <script lang="ts">
-import * as Channels from '../../core/posts/Channels';
-import * as Posts from '../../core/posts/Posts';
-import * as Files from '../../core/posts/Files';
-import * as Encrypt from '../../core/encrypt';
+import * as Encrypt from '../../../encrypt';
+import { main } from '../../backend';
+const { Channels, Posts, Files } = main;
 
 import marked from 'marked';
-import { toReadableSize, extractSummaryFromFileInfo } from '../../utils';
+import { toReadableSize, extractSummaryFromFileInfo, queue } from '../../utils';
 import { remote } from 'electron';
 import { promises as fs } from 'fs';
 import { basename } from 'path';
@@ -178,7 +177,7 @@ export default Vue.extend({
         }
 
         const pid = Encrypt.randomBuffer(16);
-        const privateKey = Channels.getPrivateKey(cid);
+        const privateKey = Encrypt.string2prvkey(Channels.getPrivateKey(cid));
 
         if (!privateKey) {
           throw new Error('Private key not found');
@@ -186,12 +185,14 @@ export default Vue.extend({
 
         this.perror = 'Processing files, please wait...';
 
-        const fileinfos = await Promise.all(this.files.map(async (file) => {
+        const fileinfos = await queue(this.files.map((file) => async () => {
           const fileinfo = Encrypt.signObject(privateKey, await Files.parseFile(file.path));
           await Files.publishFile(cid, fileinfo, file.path);
 
           return fileinfo;
-        }));
+        }), (now, all) => {
+          this.perror = `Processing files (${now}/${all})`;
+        });
 
         const files = fileinfos.map(extractSummaryFromFileInfo);
 

@@ -47,3 +47,12 @@ export interface IPostSummary {
 }
 
 export type RequestType = 'offline' | 'online' | 'both';
+
+export interface IMain {
+  Channels: typeof import('./core/posts/Channels');
+  Config: typeof import('./core/posts/Config');
+  Posts: typeof import('./core/posts/Posts');
+  Files: typeof import('./core/posts/Files');
+  Peers: typeof import('./core/peers/Peers');
+  server: typeof import('./core/p2p/server');
+}

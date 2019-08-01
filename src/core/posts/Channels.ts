@@ -2,8 +2,8 @@
 
 import Store from 'configstore';
 import * as R from 'ramda';
-import { generateChannelID, string2pubkey, verifyPublicKey, string2prvkey } from '../encrypt';
-import { RequestType, IPostSummary } from '../types';
+import { generateChannelID, verifyPublicKey } from '../../encrypt';
+import { RequestType, IPostSummary } from '../../types';
 import Peers from '../peers/Peers';
 import ObjectHash from 'object-hash';
 
@@ -31,10 +31,10 @@ export const registerPublicKey = (publickey: string) => {
  * @param {RequestType} online 获取方式
  */
 export const getPublicKey = async (cid: string, online: RequestType = 'both') => {
-  const keystr: string = store.get(`publickey.${cid}`);
+  const keystr = store.get(`publickey.${cid}`) as string | undefined;
 
   if (online === 'offline' || online === 'both' && keystr) {
-    return keystr ? string2pubkey(keystr) : null;
+    return keystr;
   }
 
   const fres = await Peers.each((pr) => pr.queryPublicKey(cid));
@@ -44,7 +44,7 @@ export const getPublicKey = async (cid: string, online: RequestType = 'both') =>
     store.set(`publickey.${cid}`, result);
   }
 
-  return result ? string2pubkey(result) : null;
+  return result;
 };
 
 /**
@@ -152,6 +152,6 @@ export const registerPrivateKey = (cid: string, privateKey: string) => {
 /**
  * 获取私钥
  */
-export const getPrivateKey = (cid: string) => {
-  return string2prvkey(store.get(`privatekey.${cid}`));
+export const getPrivateKey = (cid: string): string | undefined => {
+  return store.get(`privatekey.${cid}`);
 };

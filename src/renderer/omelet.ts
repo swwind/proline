@@ -5,7 +5,7 @@ import { createConnection, Socket } from 'net';
 import log from 'electron-log';
 import path from 'path';
 import * as R from 'ramda';
-import Peers from './core/peers/Peers';
+import Peers from '../core/peers/Peers';
 
 let child: ChildProcessWithoutNullStreams;
 let exit = false;

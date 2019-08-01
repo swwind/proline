@@ -47,7 +47,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import * as Config from './core/posts/Config';
+import { main } from './backend';
+const { Config } = main;
 
 export default Vue.extend({
   name: 'ProlineFrontend',
@@ -225,7 +226,8 @@ button, .real-button, .radius-button, .select {
   border-radius: 5px;
   border: 2px solid var(--level-3-color);
   outline: none;
-  transition: all .3s;
+  display: inline-block;
+  transition: all .3s, transform .1s;
   cursor: pointer;
   font-size: 18px;
   margin: 10px 20px 10px 0;
@@ -240,6 +242,10 @@ button, .real-button, .radius-button, .select {
 
   &:focus {
     border: 2px solid var(--theme-color);
+  }
+
+  &:active {
+    transform: translateY(3px);
   }
 
   &:disabled {

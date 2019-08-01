@@ -43,12 +43,13 @@
 </template>
 
 <script lang="ts">
-import * as Posts from '../core/posts/Posts';
+import { main } from '../backend';
+const { Posts } = main;
 import marked from 'marked';
 import { toReadableSize } from '../utils';
 
 import Vue from 'vue';
-import { IPostInfo } from '../core/types';
+import { IPostInfo } from '../../both/types';
 
 export default Vue.extend({
   name: 'PostPage',

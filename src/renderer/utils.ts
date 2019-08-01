@@ -1,6 +1,4 @@
-
-import crypto from 'crypto';
-import { IFileInfo, IFileSummary } from './core/types';
+import { IFileInfo, IFileSummary } from '../types';
 
 export const toReadableSize = (size) => {
   const b = size;
@@ -29,14 +27,33 @@ export const toReadableSize = (size) => {
   return `${b} B`;
 };
 
-export const randomID = (length: number) => {
-  return crypto.randomBytes(length).toString('hex');
-};
-
 export const extractSummaryFromFileInfo = (fi: IFileInfo): IFileSummary => {
   return {
     fid: fi.fid,
     filename: fi.filename,
     size: fi.size,
   };
+};
+
+/**
+ * Promise 排队
+ */
+export const queue = async <T> (ps: (() => Promise<T>)[], progress?: (now: number, all: number) => void) => {
+  let now = 0;
+  const length = ps.length;
+  const next = async () => {
+    if (progress) {
+      progress(++now, length);
+    }
+    const first = ps.shift();
+    const res: T[] = [];
+    if (first) {
+      res.push(await first());
+      res.push(...await next());
+    }
+
+    return res;
+  };
+
+  return await next();
 };

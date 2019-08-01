@@ -4,10 +4,10 @@ import Store from 'configstore';
 import { promises as fs, constants as fsconst } from 'fs';
 import path from 'path';
 import * as R from 'ramda';
-import { IFileInfo, RequestType } from '../types';
+import { IFileInfo, RequestType } from '../../types';
 import Peers from '../peers/Peers';
 import * as Channels from './Channels';
-import { verifySignature, md5, randomBuffer, filePieceHash } from '../encrypt';
+import { verifySignature, md5, randomBuffer, filePieceHash, string2pubkey } from '../../encrypt';
 import DiskWriter from '../utils/DiskWriter';
 import Peer from '../peers/Peer';
 import log from 'electron-log';
@@ -61,7 +61,7 @@ export const getFileInfo = async (cid: string, fid: string, online: RequestType 
   }
 
   const fres = await Peers.each((pr) => pr.queryFileInfo(cid, fid));
-  const publickey = await Channels.getPublicKey(cid, online);
+  const publickey = string2pubkey(await Channels.getPublicKey(cid, online));
   if (!publickey) {
     throw new Error('Public key not found');
   }
@@ -72,20 +72,6 @@ export const getFileInfo = async (cid: string, fid: string, online: RequestType 
   }
 
   return result;
-};
-
-export type FileStatus = 'DOWNLOADING' | 'NOTSTARTED' | 'FINISHED';
-
-export const getFileStatus = (cid: string, fid: string): FileStatus => {
-  const state = sgetPieceStatus(cid, fid);
-  if (state === true) {
-    return 'FINISHED';
-  }
-  if (Array.isArray(state)) {
-    return 'DOWNLOADING';
-  }
-
-  return 'NOTSTARTED';
 };
 
 /**
@@ -123,6 +109,22 @@ export const hasFile = async (cid: string, fid: string) => {
   }
 
   return true;
+};
+
+export type FileStatus = 'DOWNLOADING' | 'NOTSTARTED' | 'FINISHED';
+
+/**
+ * 获取文件状态
+ */
+export const getFileStatus = async (cid: string, fid: string): Promise<FileStatus> => {
+  if (finished(cid, fid) && await hasFile(cid, fid)) {
+    return 'FINISHED';
+  }
+  if (started(cid, fid)) {
+    return 'DOWNLOADING';
+  }
+
+  return 'NOTSTARTED';
 };
 
 /**
@@ -184,6 +186,9 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
   // 下载
   const piece = lack[Math.floor(Math.random() * lack.length)];
   try {
+    log.log(`Lack ${lack.length} pieces`);
+    log.log(`Downloading piece ${piece} from ${pr.address}`);
+
     const buffer = await pr.queryFilePiece(cid, fid, piece);
     if (finished(cid, fid)) {
       return;
@@ -191,6 +196,7 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
     if (md5(buffer).slice(0, 16) !== fileinfo.pieces[piece]) {
       throw new Error(`Piece failed hash check: ${cid}/${fid}[${piece}]`);
     }
+    log.log(`Downloading piece ${piece} success`);
     await dw.write(buffer, fileinfo.psize * piece);
   } catch (e) {
     log.error(`Error while downloading piece ${cid}/${fid}[${piece}]: ${e.message}`);
@@ -210,7 +216,7 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
     throw new Error('File info not found');
   }
 
-  if (finished(cid, fid)) {
+  if (finished(cid, fid) && await hasFile(cid, fid)) {
     throw new Error('Task finished');
   }
 
@@ -229,6 +235,8 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
   prs.forEach((pr) => download(cid, fid, pr, dw));
 
   // TODO: flush peer
+
+  log.log(`${prs.length} peers is working...`);
 
 };
 

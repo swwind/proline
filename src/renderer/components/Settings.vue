@@ -10,7 +10,7 @@
       </div>
       <textarea
         v-model="expeer"
-        @change="save('expeer')"
+        @change="saveExpeer()"
       />
     </div>
     <div class="block">
@@ -30,7 +30,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import * as Config from '../core/posts/Config';
+import { main } from '../backend';
+const { Config } = main;
 
 export default Vue.extend({
   name: 'Settings',
@@ -43,6 +44,9 @@ export default Vue.extend({
   methods: {
     saveTheme() {
       Config.changeTheme(this.darktheme);
+    },
+    saveExpeer() {
+      Config.updatePeers(this.expeer);
     }
   }
 });
@@ -88,6 +92,7 @@ export default Vue.extend({
     border: 2px solid var(--level-3-color);
     outline: none;
     transition: all .3s;
+    color: var(--main-color);
 
     &:focus {
       border-color: var(--theme-color);
