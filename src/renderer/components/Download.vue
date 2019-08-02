@@ -8,7 +8,14 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
+
+export default Vue.extend({
+  name: 'Download',
+});
 </script>
 
-<style>
+
+<style lang="scss">
 </style>
+

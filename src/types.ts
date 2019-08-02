@@ -56,3 +56,5 @@ export interface IMain {
   Peers: typeof import('./core/peers/Peers');
   server: typeof import('./core/p2p/server');
 }
+
+export type FileStatus = 'DOWNLOADING' | 'PAUSED' | 'NOTSTARTED' | 'FINISHED'

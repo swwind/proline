@@ -22,31 +22,49 @@
         />
         <button
           :disabled="!downloadok"
-          @click="download()"
+          @click="startDownload()"
         >
           <i class="icon">arrow_downward</i>
           Download
         </button>
       </div>
-      <video
-        v-if="videourl"
-        id="video"
-        class="video"
-        controls="controls"
-        :src="videourl"
-      />
-      <img
-        v-if="imageurl"
-        class="image"
-        :src="`file://${filepath}`"
-      >
-      <button
-        v-if="state === 'FINISHED'"
-        @click="openFile()"
-      >
-        <i class="icon">open_in_new</i>
-        View in File Manager
-      </button>
+      <div v-if="state === 'PAUSED'">
+        <button @click="continueDownload()">
+          <i class="icon">play_arrow</i>
+          Continue
+        </button>
+      </div>
+      <div v-if="state === 'DOWNLOADING'">
+        <div class="progress">
+          <div
+            class="progress-bar"
+            :style="{ width: (progress / file.pieces.length) * 100 + '%' }"
+          >
+            {{ progress }} / {{ file.pieces.length }}
+          </div>
+        </div>
+      </div>
+      <div v-if="state === 'FINISHED'">
+        <video
+          v-if="videourl"
+          id="video"
+          class="video"
+          controls="controls"
+          :src="videourl"
+        />
+        <img
+          v-if="imageurl"
+          class="image"
+          :src="`file://${filepath}`"
+        >
+        <button
+          v-if="state === 'FINISHED'"
+          @click="openFile()"
+        >
+          <i class="icon">open_in_new</i>
+          View in File Manager
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -55,7 +73,7 @@
 import Vue from 'vue';
 import { main } from '../backend';
 const { Files } = main;
-import { IFileInfo } from '../../both/types';
+import { IFileInfo, FileStatus } from '../../types';
 import { shell, remote } from 'electron';
 import flvjs from 'flv.js';
 
@@ -70,12 +88,14 @@ export default Vue.extend({
       loading: 'Loading...',
       file: null as IFileInfo | null,
       filepath: '',
-      state: '',
+      state: '' as FileStatus,
       videourl: false as string | boolean,
       imageurl: false,
       savepath: '',
       folder: 'Choose a folder...',
       downloadok: false,
+      progress: 0, // 已经下载的 piece 数量
+      intervalid: null as NodeJS.Timer | null,
     };
   },
   async mounted() {
@@ -114,7 +134,21 @@ export default Vue.extend({
       }
     }
 
+    this.intervalid = setInterval(async () => {
+      if (this.state === 'DOWNLOADING') {
+        this.progress = await Files.getFileDownloadProgress(this.cid, this.fid);
+
+        if (this.file && this.progress === this.file.pieces.length) {
+          this.state = 'FINISHED';
+        }
+      }
+    }, 1000);
     this.loading = '';
+  },
+  async destroyed() {
+    if (this.intervalid) {
+      clearInterval(this.intervalid);
+    }
   },
   methods: {
     openFile() {
@@ -129,14 +163,20 @@ export default Vue.extend({
         this.downloadok = true;
       }
     },
-    download() {
+    startDownload() {
       Files.startDownload(this.cid, this.fid, this.folder);
+      this.state = 'DOWNLOADING';
+    },
+    continueDownload() {
+      Files.continueDownload(this.cid, this.fid);
+      this.state = 'DOWNLOADING';
     }
   }
 });
+
 </script>
 
-<style>
+<style lang="scss">
 .video, .image {
   width: 100%;
   max-width: 1000px;
@@ -150,5 +190,25 @@ export default Vue.extend({
   cursor: pointer;
   user-select: none;
   color: var(--level-1-color);
+}
+
+.progress {
+  display: block;
+  border-radius: 5px;
+  background-color: var(--level-3-color);
+  height: 25px;
+
+  .progress-bar {
+    font-size: 18px;
+    line-height: 25px;
+    float: left;
+    height: 100%;
+    border-radius: 5px;
+    text-align: center;
+    background-color: var(--dark-green-color);
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: width .3s;
+  }
 }
 </style>

@@ -4,7 +4,7 @@ import Store from 'configstore';
 import { promises as fs, constants as fsconst } from 'fs';
 import path from 'path';
 import * as R from 'ramda';
-import { IFileInfo, RequestType } from '../../types';
+import { IFileInfo, RequestType, FileStatus } from '../../types';
 import Peers from '../peers/Peers';
 import * as Channels from './Channels';
 import { verifySignature, md5, randomBuffer, filePieceHash, string2pubkey } from '../../encrypt';
@@ -17,6 +17,11 @@ const store = new Store('proline-files', {
   pieces: { }, // 下载片段情况 [cid][fid]: boolean[] | true
   fileinfo: { }, // 文件信息（种子） [cid][fid]
 });
+
+/**
+ * 保存正在下载的文件列表
+ */
+const downloadSet = new Set<string>();
 
 const sgetPieceStatus = (cid: string, fid: string): boolean[] | true | undefined => {
   return store.get(`pieces.${cid}.${fid}`);
@@ -111,8 +116,6 @@ export const hasFile = async (cid: string, fid: string) => {
   return true;
 };
 
-export type FileStatus = 'DOWNLOADING' | 'NOTSTARTED' | 'FINISHED';
-
 /**
  * 获取文件状态
  */
@@ -120,11 +123,39 @@ export const getFileStatus = async (cid: string, fid: string): Promise<FileStatu
   if (finished(cid, fid) && await hasFile(cid, fid)) {
     return 'FINISHED';
   }
-  if (started(cid, fid)) {
+  if (downloadSet.has(cid + fid)) {
     return 'DOWNLOADING';
+  }
+  if (started(cid, fid)) {
+    return 'PAUSED';
   }
 
   return 'NOTSTARTED';
+};
+
+/**
+ * 获取文件下载进度
+ */
+export const getFileDownloadProgress = async (cid: string, fid: string) => {
+  const fileState = await getFileStatus(cid, fid);
+  const fileinfo = await getFileInfo(cid, fid);
+  if (!fileinfo) {
+    return 0;
+  }
+  if (fileState === 'FINISHED') {
+    return fileinfo.pieces.length;
+  }
+  if (fileState === 'DOWNLOADING' || fileState === 'PAUSED') {
+    const piece = await sgetPieceStatus(cid, fid);
+
+    if (Array.isArray(piece)) {
+      return R.sum(R.map(Number, piece));
+    }
+
+    return piece === true ? fileinfo.pieces.length : 0;
+  }
+
+  return 0;
 };
 
 /**
@@ -177,7 +208,9 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
     .map(([, i]) => i);
 
   if (!lack.length) {
+    // 这里判断 finish 事件
     ssetPieceStatus(cid, fid, true);
+    downloadSet.delete(cid + fid);
     await dw.close();
 
     return;
@@ -237,6 +270,25 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
   // TODO: flush peer
 
   log.log(`${prs.length} peers is working...`);
+  downloadSet.add(cid + fid);
+
+};
+
+export const continueDownload = async (cid: string, fid: string) => {
+  const filepath = sgetFilePath(cid, fid);
+  const fileinfo = sgetFileInfo(cid, fid);
+
+  if (!filepath || !fileinfo) {
+    throw new Error('Unable to continue download: data not found');
+  }
+
+  const dw = new DiskWriter();
+  await dw.open(filepath, fileinfo.size);
+  const prs = await Peers.haveFile(cid, fid);
+  prs.forEach((pr) => download(cid, fid, pr, dw));
+
+  log.log(`${prs.length} peers is continued...`);
+  downloadSet.add(cid + fid);
 
 };
 
