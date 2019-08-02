@@ -150,4 +150,6 @@ const app = new Koa();
 app.use(logger());
 app.use(mount('/api/v1', api));
 
+app.listen(25468);
+
 export default app;
