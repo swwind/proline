@@ -1,5 +1,5 @@
 // 管理 omelet
-
+/*
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { createConnection, Socket } from 'net';
 import log from 'electron-log';
@@ -119,3 +119,4 @@ const createClient = (server: string) => {
 };
 
 export default createClient;
+*/
