@@ -5,7 +5,7 @@ import { promises as fs, constants as fsconst } from 'fs';
 import path from 'path';
 import * as R from 'ramda';
 import { IFileInfo, RequestType, FileStatus } from '../../types';
-import Peers from '../peers/Peers';
+import * as Peers from '../peers/Peers';
 import * as Channels from './Channels';
 import { verifySignature, md5, randomBuffer, filePieceHash, string2pubkey } from '../../encrypt';
 import DiskWriter from '../utils/DiskWriter';

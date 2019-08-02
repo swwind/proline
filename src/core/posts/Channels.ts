@@ -4,7 +4,7 @@ import Store from 'configstore';
 import * as R from 'ramda';
 import { generateChannelID, verifyPublicKey } from '../../encrypt';
 import { RequestType, IPostSummary } from '../../types';
-import Peers from '../peers/Peers';
+import * as Peers from '../peers/Peers';
 import ObjectHash from 'object-hash';
 
 const store = new Store('proline-channel', {

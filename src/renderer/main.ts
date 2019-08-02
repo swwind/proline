@@ -3,8 +3,9 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import VueElectron from 'vue-electron';
-import Peers from '../core/peers/Peers';
-import * as Config from '../core/posts/Config';
+
+import { main } from './backend';
+const { Config, Peers } = main;
 
 Vue.use(VueElectron);
 
@@ -17,8 +18,9 @@ new Vue({
 document.addEventListener('dragover', (event) => event.preventDefault(), false);
 document.addEventListener('drop', (event) => event.preventDefault(), false);
 
+// FATAL ERROR: FUNCTION IS NOT SUPPORT
 const updateSettingPeers = (config) => {
-  Peers.updatePeers('SETTING', new Set(config.expeer.split(/\s/g).filter(Boolean)));
+  Peers.updatePeers('SETTING', config.expeer.split(/\s/g).filter(Boolean));
 };
 Config.handleUpdate(updateSettingPeers);
 updateSettingPeers(Config.getConfig());

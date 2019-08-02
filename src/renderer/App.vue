@@ -48,6 +48,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { main } from './backend';
+// import { log } from 'util';
 const { Config } = main;
 
 export default Vue.extend({

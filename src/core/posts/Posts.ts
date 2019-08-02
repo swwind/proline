@@ -2,7 +2,7 @@
 
 import Store from 'configstore';
 import { IPostInfo, IPostSummary, RequestType } from '../../types';
-import Peers from '../peers/Peers';
+import * as Peers from '../peers/Peers';
 import { verifySignature, string2pubkey } from '../../encrypt';
 import * as R from 'ramda';
 import * as Channels from './Channels';
