@@ -17,17 +17,6 @@ export default class Peer {
   }
 
   /**
-   * 发送消息
-   */
-  public async message(message: string) {
-    const response = await this.axios.post('/message', { message });
-
-    if (response.status !== 200) {
-      throw new Error(response.data);
-    }
-  }
-
-  /**
    * 询问文件信息（种子）
    */
   public async queryFileInfo(cid: string, fid: string): Promise<IFileInfo> {
@@ -104,7 +93,7 @@ export default class Peer {
    * 获取文件片段，不做检查
    */
   public async queryFilePiece(cid: string, fid: string, index: number): Promise<Buffer> {
-    const result = await this.axios.get('/file-piece', { params: { cid, fid, index } });
+    const result = await this.axios.get('/filepiece', { params: { cid, fid, index } });
 
     if (result.status === 200) {
       return result.data;

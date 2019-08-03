@@ -3,7 +3,6 @@
 const chalk = require('chalk')
 const electron = require('electron')
 const path = require('path')
-const { say } = require('cfonts')
 const { spawn } = require('child_process')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
@@ -107,11 +106,11 @@ const startElectron = () => {
 
   electronProcess = spawn(electron, args)
   
-  electronProcess.stdout.on('data', data => {
-    console.log(data.toString());
+  electronProcess.stdout.on('data', (data) => {
+    console.log(data.toString().trim());
   })
-  electronProcess.stderr.on('data', data => {
-    console.error(data.toString());
+  electronProcess.stderr.on('data', (data) => {
+    console.error(data.toString().trim());
   })
 
   electronProcess.on('close', () => {
@@ -130,3 +129,9 @@ const init = async () => {
 }
 
 init();
+
+process.on('SIGINT', () => {
+  if (electronProcess && !electronProcess.killed) {
+    electronProcess.kill('SIGINT');
+  }
+});

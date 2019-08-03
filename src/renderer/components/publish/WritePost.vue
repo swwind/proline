@@ -1,7 +1,7 @@
 <!-- 创建频道 -->
 
 <template>
-  <div @drop="alert(233)">
+  <div class="create-channel incontainer">
     <h1>Write New Post (*´∀`)~♥</h1>
     <div
       v-if="cerror"
@@ -242,46 +242,49 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.error {
-  color: var(--red-color);
-  margin: 20px 0;
-}
 
-.fileupload {
-  height: 200px;
-  line-height: 200px;
-  text-align: center;
-  font-size: 25px;
-  border: 2px dashed var(--level-2-color);
-  color: var(--level-2-color);
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-
-.markdown-editor {
-  margin: 20px 0;
-  height: 500px;
-  border: 2px solid var(--level-3-color);
-  border-radius: 5px;
-  color: var(--main-color);
-  display: flex;
-
-  textarea, .preview {
-    flex: 1;
-    padding: 0 20px;
-    overflow: auto;
+.create-channel {
+  .error {
+    color: var(--red-color);
+    margin: 20px 0;
   }
 
-  textarea {
+  .fileupload {
+    height: 200px;
+    line-height: 200px;
+    text-align: center;
+    font-size: 25px;
+    border: 2px dashed var(--level-2-color);
+    color: var(--level-2-color);
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+
+  .markdown-editor {
+    margin: 20px 0;
+    height: 500px;
+    border: 2px solid var(--level-3-color);
+    border-radius: 5px;
     color: var(--main-color);
-    border: none;
-    resize: none;
-    outline: none;
-    background-color: var(--level-3-color);
-    font-size: 16px;
-    font-family: 'Monaco', courier, monospace;
-    padding: 20px;
+    display: flex;
+
+    textarea, .preview {
+      flex: 1;
+      padding: 0 20px;
+      overflow: auto;
+    }
+
+    textarea {
+      color: var(--main-color);
+      border: none;
+      resize: none;
+      outline: none;
+      background-color: var(--level-3-color);
+      font-size: 16px;
+      font-family: 'Monaco', courier, monospace;
+      padding: 20px;
+    }
   }
 }
 </style>

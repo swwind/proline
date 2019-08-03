@@ -164,9 +164,16 @@ export const getFileDownloadProgress = async (cid: string, fid: string) => {
 export const getFilePiece = async (cid: string, fid: string, index: number) => {
   const filepath = sgetFilePath(cid, fid);
   const fileinfo = sgetFileInfo(cid, fid);
-  if (!filepath || !fileinfo) {
+  const piece = sgetPieceStatus(cid, fid);
+  if (!filepath || !fileinfo || !piece) {
     throw new Error('Lack infomations');
   }
+
+  if (Array.isArray(piece) && !piece[index]) {
+    // 还没有下载到
+    throw new Error('Piece Not Found');
+  }
+
   const fh = await fs.open(filepath, 'r');
   const length = index === fileinfo.pieces.length - 1
     ? fileinfo.size - fileinfo.psize * index

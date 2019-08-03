@@ -18,7 +18,7 @@ new Vue({
 document.addEventListener('dragover', (event) => event.preventDefault(), false);
 document.addEventListener('drop', (event) => event.preventDefault(), false);
 
-// FATAL ERROR: FUNCTION IS NOT SUPPORT
+// FIXME: FUNCTION IS NOT SUPPORT
 const updateSettingPeers = (config) => {
   Peers.updatePeers('SETTING', config.expeer.split(/\s/g).filter(Boolean));
 };

@@ -187,9 +187,12 @@ h3, .h3 {
   overflow-x: hidden;
   overflow-y: auto;
 
-  padding: 25px;
-  padding-left: 100px;
+  padding-left: 75px;
   box-sizing: border-box;
+
+  .incontainer {
+    margin: 25px;
+  }
 }
 
 .list {

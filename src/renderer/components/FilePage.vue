@@ -1,5 +1,5 @@
 <template>
-  <div class="download">
+  <div class="filepage incontainer">
     <div
       v-if="loading"
       class="loading"
@@ -177,38 +177,41 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.video, .image {
-  width: 100%;
-  max-width: 1000px;
-  display: block;
-  margin: 20px 0;
-  border: none;
-  outline: none;
-}
 
-.folder {
-  cursor: pointer;
-  user-select: none;
-  color: var(--level-1-color);
-}
+.filepage {
+  .video, .image {
+    width: 100%;
+    max-width: 1000px;
+    display: block;
+    margin: 20px 0;
+    border: none;
+    outline: none;
+  }
 
-.progress {
-  display: block;
-  border-radius: 5px;
-  background-color: var(--level-3-color);
-  height: 25px;
+  .folder {
+    cursor: pointer;
+    user-select: none;
+    color: var(--level-1-color);
+  }
 
-  .progress-bar {
-    font-size: 18px;
-    line-height: 25px;
-    float: left;
-    height: 100%;
+  .progress {
+    display: block;
     border-radius: 5px;
-    text-align: center;
-    background-color: var(--dark-green-color);
-    white-space: nowrap;
-    box-sizing: border-box;
-    transition: width .3s;
+    background-color: var(--level-3-color);
+    height: 25px;
+
+    .progress-bar {
+      font-size: 18px;
+      line-height: 25px;
+      float: left;
+      height: 100%;
+      border-radius: 5px;
+      text-align: center;
+      background-color: var(--dark-green-color);
+      white-space: nowrap;
+      box-sizing: border-box;
+      transition: width .3s;
+    }
   }
 }
 </style>

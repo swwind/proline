@@ -1,8 +1,7 @@
 .DS_Store
 dist/
-static/client_linux
 build/*
-!build/icons
+bin/*
 node_modules/
 yarn-error.log
 npm-debug.log
@@ -11,4 +10,3 @@ thumbs.db
 !.gitkeep
 package-lock.json
 yarn.lock
-out/

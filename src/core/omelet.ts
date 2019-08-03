@@ -1,39 +1,63 @@
 // 管理 omelet
-/*
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+
+import { spawn, ChildProcess } from 'child_process';
 import { createConnection, Socket } from 'net';
 import log from 'electron-log';
 import path from 'path';
 import * as R from 'ramda';
-import * as Peers from '../core/peers/Peers';
+import * as Peers from './peers/Peers';
 
-let child: ChildProcessWithoutNullStreams;
+let child: ChildProcess;
 let exit = false;
 
 const localport = 21183;
 
+const spawnLinux = (server: string) => {
+  const filepath = path.resolve(__dirname, '..', 'bin', 'client_linux');
+
+  log.log(filepath);
+
+  return spawn('pkexec', [
+    filepath,
+    '-s',
+    server,
+  ], {
+    stdio: ['inherit', 'inherit', 'inherit']
+  });
+};
+
+const spawnWindows = (server: string) => {
+  const filepath = path.resolve(__dirname, '..', 'bin', 'client_windows.exe');
+
+  return spawn(filepath, [
+    '-s', server
+  ]);
+};
+
 const spawnClient = (server: string) => {
 
-  const filepath = process.env.NODE_ENV === 'production'
-    ? path.resolve(__dirname, './static/client_linux')
-    : path.resolve(__dirname, '../static/client_linux');
-
-  child = spawn(filepath, [
-    '-s', server,
-    '-b', `0.0.0.0:${localport}`,
-  ]);
+  const platform = process.platform;
+  if (platform === 'linux') {
+    child = spawnLinux(server);
+  } else if (platform === 'win32') {
+    child = spawnWindows(server);
+  } else {
+    return log.error(`[OMELET] platform not supported: ${platform}`);
+  }
 
   if (!child) {
     return log.error('[OMELET] client file not found');
   }
 
-  child.on('exit', (code, signal) => {
+  child.on('close', (code, signal) => {
     // 不是正常退出，重新创建进程
     if (!exit) {
       setTimeout(() => {
         spawnClient(server);
       }, 1000);
-      log.error(`[OMELET] Child exit with code=${code} signal=${signal}`);
+      log.error(`[OMELET] Omelet exit with code=${code} signal=${signal}`);
+    } else {
+      process.exit();
     }
   });
 
@@ -47,17 +71,28 @@ const spawnClient = (server: string) => {
 
 const exitClient = () => {
   exit = true;
+  log.log('[OMELET] check process for exit...');
   if (child && !child.killed) {
     child.kill('SIGINT');
+    log.log('[OMELET] exited...');
+  } else {
+    process.exit();
   }
 };
 
-process.on('exit', () => {
+process.on('SIGINT', (code) => {
+  log.log(`exit code: ${code}`);
   exitClient();
 });
 
 let socket: Socket;
 let localip: string;
+
+const buffer2ipv6 = (str: Buffer | number[]) => {
+  return R.splitEvery(2, Array.from(str))
+    .map((a) => Buffer.from(a).toString('hex'))
+    .join(':');
+};
 
 const createClient = (server: string) => {
 
@@ -68,33 +103,33 @@ const createClient = (server: string) => {
       // alive
       return;
     }
+    // otherwise create a new process
     socket = createConnection({ port: localport }, () => {
-      socket.write(Buffer.from('d3890400', 'hex'));
+      socket.write(Buffer.from('d3090400', 'hex'));
     });
     socket.on('data', (data) => {
       const header = data.slice(0, 2).toString('hex');
       const length = (data[3] << 4) | data[2];
       switch (header) {
-        case 'd349': {
+        case 'd409': {
           // 发送本地端口
-          localip = data.slice(4, 8).join('.');
+          localip = buffer2ipv6(data.slice(4, 20));
+          log.log(`[OMELET] localip: ${localip}`);
           setTimeout(() => {
-            socket.write(Buffer.from('d3880400', 'hex'));
+            socket.write(Buffer.from('d3080400', 'hex'));
           }, 500);
           break;
         }
-        case 'd348': {
+        case 'd408': {
           // 发送虚拟地址
           const list = data.slice(4, length);
-          if (list.length % 4 > 0) {
+          if (list.length % 16 > 0) {
             return log.error('[OMELET] Recieved broken packet');
           }
-          const ips = R.splitEvery(8, list.toString('hex')).map((v) => {
-            return Buffer.from(v, 'hex').join('.');
-          });
-          const ipset = new Set(ips);
+          const ips = R.splitEvery(16, Array.from(list)).map(buffer2ipv6);
+          const ipset = new Set<string>(ips);
           ipset.delete(localip);
-          Peers.updatePeers('SERVER', ipset);
+          Peers.updatePeers('SERVER', Array.from(ipset));
           setTimeout(() => {
             socket.write(Buffer.from('d3880400', 'hex'));
           }, 15000);
@@ -119,4 +154,3 @@ const createClient = (server: string) => {
 };
 
 export default createClient;
-*/

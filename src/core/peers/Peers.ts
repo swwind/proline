@@ -5,7 +5,7 @@ const prs: Set<Peer> = new Set();
 const map: Map<string, Peer> = new Map();
 
 export const addPeer = (ip: string) => {
-  log.log(`Add Peer???: ${ip}`);
+  log.log(`Add Peer: ${ip}`);
   const peer = new Peer(ip, 25468);
   prs.add(peer);
   map.set(ip, peer);
@@ -78,4 +78,8 @@ export const updatePeers = (partition: string, ips: string[]) => {
 
 export const peerNumbers = () => {
   return prs.size;
+};
+
+export const peerList = () => {
+  return Array.from(map.keys());
 };

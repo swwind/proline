@@ -1,5 +1,5 @@
 <template>
-  <div class="download">
+  <div class="download incontainer">
     <h1>Downloads</h1>
     <div class="setsumei">
       Hello worlds

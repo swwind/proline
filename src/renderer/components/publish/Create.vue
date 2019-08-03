@@ -1,7 +1,7 @@
 <!-- 创建频道 -->
 
 <template>
-  <div>
+  <div class="create-channel incontainer">
     <h1>Create New Channel (๑• ω •๑)</h1>
     <div v-if="!keypair">
       Generating Key Pair...
@@ -74,8 +74,10 @@ export default Vue.extend({
 });
 </script>
 
-<style>
-.error {
-  color: var(--red-color);
+<style lang="scss">
+.create-channel {
+  .error {
+    color: var(--red-color);
+  }
 }
 </style>

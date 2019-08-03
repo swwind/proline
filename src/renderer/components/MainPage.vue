@@ -1,7 +1,7 @@
 <!-- 显示所有频道 -->
 
 <template>
-  <div>
+  <div class="channels incontainer">
     <h1>Proline (ﾉ&gt;ω&lt;)ﾉ</h1>
     <div
       v-if="error"
@@ -83,10 +83,12 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style lang="scss">
 
-.time, .id {
-  color: var(--level-2-color);
+.channels {
+  .time, .id {
+    color: var(--level-2-color);
+  }
 }
 
 </style>

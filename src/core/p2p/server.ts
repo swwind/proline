@@ -84,8 +84,12 @@ router.get('/filepiece', async (ctx) => {
     return ctx.end(404, 'FILE NOT FOUND');
   }
 
-  const buffer = await Files.getFilePiece(ctx.query.cid, ctx.query.fid, Number(ctx.query.index));
-  ctx.end(200, buffer);
+  try {
+    const buffer = await Files.getFilePiece(ctx.query.cid, ctx.query.fid, Number(ctx.query.index));
+    ctx.end(200, buffer);
+  } catch (e) {
+    ctx.end(500, e.message.toUpperCase());
+  }
 });
 
 // 获取公钥
@@ -103,18 +107,6 @@ router.get('/publickey', async (ctx) => {
 });
 
 // ================= POST =================
-
-// 发送消息
-// - message
-router.post('/message', async (ctx) => {
-  const body = ctx.request.body;
-  if (!body.message) {
-    return ctx.end(400, 'BAD REQUEST');
-  }
-  /* eslint-disable-next-line no-console */
-  console.log(`recv: ${body.message}`);
-  ctx.end(200, 'OK');
-});
 
 // 主动推送文章更新
 // - cid
@@ -152,4 +144,4 @@ app.use(mount('/api/v1', api));
 
 app.listen(25468);
 
-export default app;
+export { app };

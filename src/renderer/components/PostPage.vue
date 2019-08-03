@@ -1,7 +1,7 @@
 <!-- 显示文章内容 post info -->
 
 <template>
-  <div class="post">
+  <div class="post incontainer">
     <h1 v-text="title" />
     <div
       v-if="error"
@@ -49,7 +49,7 @@ import marked from 'marked';
 import { toReadableSize } from '../utils';
 
 import Vue from 'vue';
-import { IPostInfo } from '../../both/types';
+import { IPostInfo } from '../../types';
 
 export default Vue.extend({
   name: 'PostPage',
@@ -91,8 +91,10 @@ export default Vue.extend({
 
 </script>
 
-<style>
-.content {
-  margin-bottom: 50px;
+<style lang="scss">
+.incontainer {
+  .content {
+    margin-bottom: 50px;
+  }
 }
 </style>

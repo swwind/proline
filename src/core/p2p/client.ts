@@ -10,20 +10,11 @@ export default (address: string, port: number) => {
 
   log('isipv6:', isIPv6(address));
 
-  // TODO: ipv4
   const axs = axios.create({
     baseURL,
     timeout: 2000,
     maxRedirects: 0,
     validateStatus: () => true,
-  });
-
-  axs.interceptors.request.use((res) => {
-    log(res.url);
-
-    return res;
-  }, (err) => {
-    throw err;
   });
 
   return axs;

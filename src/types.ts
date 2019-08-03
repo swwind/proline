@@ -54,7 +54,6 @@ export interface IMain {
   Posts: typeof import('./core/posts/Posts');
   Files: typeof import('./core/posts/Files');
   Peers: typeof import('./core/peers/Peers');
-  server: typeof import('./core/p2p/server');
 }
 
 export type FileStatus = 'DOWNLOADING' | 'PAUSED' | 'NOTSTARTED' | 'FINISHED'

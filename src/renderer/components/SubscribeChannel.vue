@@ -1,7 +1,7 @@
 <!-- 显示频道内的文章列表 -->
 
 <template>
-  <div>
+  <div class="subscribe-channel incontainer">
     <h1>Subscribe New Channel (´,,•ω•,,)♡</h1>
     <div class="setsumei">
       You need to provide Channel ID(cid) so as to subscribe a channel. <br>
@@ -81,9 +81,12 @@ export default Vue.extend({
 });
 </script>
 
-<style>
-.error {
-  color: var(--red-color);
-  height: 20px;
+<style lang="scss">
+.subscribe-channel {
+
+  .error {
+    color: var(--red-color);
+    height: 20px;
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 <!-- 显示所有频道 -->
 
 <template>
-  <div>
+  <div class="publish-home incontainer">
     <h1>My Channels (,,・ω・,,)</h1>
     <div
       v-if="error"

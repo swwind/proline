@@ -1,7 +1,7 @@
 <!-- 显示频道内的文章列表 -->
 
 <template>
-  <div class="chan">
+  <div class="chan incontainer">
     <h1 v-text="title" />
     <div
       v-if="error"
@@ -91,11 +91,13 @@ export default Vue.extend({
 });
 </script>
 
-<style>
-.post .unread .title {
-  font-weight: bold;
-}
-.post .content {
-  margin-top: 20px;
+<style lang="scss">
+.chan {
+  .post .unread .title {
+    font-weight: bold;
+  }
+  .post .content {
+    margin-top: 20px;
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 <!-- 设置界面 -->
 
 <template>
-  <div class="settings">
+  <div class="settings incontainer">
     <h1>Settings (๑¯∀¯๑)</h1>
     <div class="block">
       <h3>Add new Peer</h3>
@@ -54,49 +54,52 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.block {
-  padding: 20px 0;
-  border-bottom: 2px solid var(--level-2-color);
+.settings {
 
-  &:last-child {
-    border-bottom: none;
-  }
+  .block {
+    padding: 20px 0;
+    border-bottom: 2px solid var(--level-2-color);
 
-  .label {
-    display: block;
-    height: 30px;
+    &:last-child {
+      border-bottom: none;
+    }
 
-    span {
-      display: inline-block;
+    .label {
+      display: block;
       height: 30px;
-      line-height: 30px;
-      vertical-align: middle;
+
+      span {
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        vertical-align: middle;
+        font-size: 18px;
+      }
+
+      .input-checkbox {
+        float: right;
+        margin-right: 20px;
+      }
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
       font-size: 18px;
-    }
+      resize: none;
+      box-sizing: border-box;
+      background-color: var(--level-3-color);
+      border-radius: 5px;
+      border: 2px solid var(--level-3-color);
+      outline: none;
+      transition: all .3s;
+      color: var(--main-color);
 
-    .input-checkbox {
-      float: right;
-      margin-right: 20px;
-    }
-  }
-
-  textarea {
-    width: 100%;
-    height: 200px;
-    padding: 10px;
-    font-size: 18px;
-    resize: none;
-    box-sizing: border-box;
-    background-color: var(--level-3-color);
-    border-radius: 5px;
-    border: 2px solid var(--level-3-color);
-    outline: none;
-    transition: all .3s;
-    color: var(--main-color);
-
-    &:focus {
-      border-color: var(--theme-color);
-      background-color: var(--background-color);
+      &:focus {
+        border-color: var(--theme-color);
+        background-color: var(--background-color);
+      }
     }
   }
 }
