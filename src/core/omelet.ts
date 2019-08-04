@@ -106,6 +106,10 @@ process.on('SIGINT', (code) => {
   log.log(`recieved exit code: ${code}`);
   exitClient();
 });
+process.on('exit', (code) => {
+  log.error(`Recieved unknown code: ${code}`);
+  exitClient();
+});
 
 let socket: Socket;
 let localip: string;

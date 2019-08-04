@@ -6,7 +6,7 @@
     <div class="block">
       <h3>Add new Peer</h3>
       <div class="setsumei">
-        Specify a peer you want to connect to one by one.
+        Specify peers you want to connect to.
       </div>
       <textarea
         v-model="expeer"
@@ -37,9 +37,6 @@ export default Vue.extend({
   name: 'Settings',
   data() {
     return Config.getConfig();
-  },
-  async mounted() {
-    // do nothing
   },
   methods: {
     saveTheme() {

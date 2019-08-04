@@ -1,6 +1,7 @@
 
-import { BrowserWindow, app, Menu, Tray } from 'electron';
+import { BrowserWindow, app, Menu, Tray, ipcMain, shell } from 'electron';
 import path from 'path';
+import { log } from 'electron-log';
 
 // import { IMain } from '../types';
 // /* eslint-disable-next-line */
@@ -10,9 +11,28 @@ import path from 'path';
 
 
 let mainWindow: BrowserWindow | null;
+let tray: Tray | null;
+let exit = false;
 const winURL = process.env.NODE_ENV !== 'production'
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`;
+
+const doExit = () => {
+  exit = true;
+  if (mainWindow) {
+    mainWindow.close();
+  }
+};
+
+const toggleMainWindow = () => {
+  if (mainWindow) {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
+  }
+};
 
 const createWindow = () => {
 
@@ -28,33 +48,55 @@ const createWindow = () => {
 
   mainWindow.loadURL(winURL);
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  const tray = new Tray(path.resolve(__dirname, 'static', 'icon', 'icon.ico'));
-  const menu = Menu.buildFromTemplate([{
-    label: 'Quit',
-    click() {
-      process.exit();
-    }
-  }, {
-    label: 'Open window',
-    click() {
-      if (mainWindow) {
-        mainWindow.show();
-      }
-    }
-  }, {
-    label: 'Hide window',
-    click() {
+  mainWindow.on('close', (e) => {
+    if (!exit) {
+      log('[MAIN] Window closed, but I don\'t want to be killed');
+      e.preventDefault();
       if (mainWindow) {
         mainWindow.hide();
       }
     }
+  });
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+
+  const menu = Menu.buildFromTemplate([{
+    label: 'File',
+    submenu: [{
+      label: 'Quit',
+      accelerator: 'Ctrl+Q',
+    }],
+  }, {
+    label: 'Help',
+    submenu: [{
+      label: 'About...',
+      click() {
+        shell.openExternal('https://github.com/swwind/proline');
+      }
+    }],
   }]);
-  tray.setToolTip('你好');
-  tray.setContextMenu(menu);
+  mainWindow.setMenu(menu);
+
+  tray = new Tray(path.resolve(
+    __dirname,
+    'static',
+    'icon',
+    process.platform === 'win32'
+      ? 'icon.ico'
+      : 'icon.jpg'
+  ));
+  const trayMenu = Menu.buildFromTemplate([{
+    label: 'Quit',
+    click: doExit,
+  }, {
+    label: 'Toggle window',
+    click: toggleMainWindow,
+  }]);
+  tray.on('click', toggleMainWindow);
+  tray.setToolTip('Hello world');
+  tray.setContextMenu(trayMenu);
 };
 
 app.on('ready', createWindow);
@@ -71,3 +113,4 @@ app.on('activate', () => {
   }
 });
 
+ipcMain.on('exit', doExit);

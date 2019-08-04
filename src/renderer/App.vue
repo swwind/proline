@@ -345,11 +345,11 @@ button, .real-button, .radius-button, .select {
   }
 
   &:checked {
-    background-color: var(--green-color);
+    background-color: var(--dark-green-color);
 
     &::after {
       left: 27.5px;
-      background-color: var(--dark-green-color);
+      background-color: var(--green-color);
     }
   }
 }
