@@ -33,7 +33,7 @@ yarn dev
 yarn run build
 ```
 
-**Note:** backend interface is not finished yet.
+**Note:** Windows is not supported yet.
 
 ## See Also
 
