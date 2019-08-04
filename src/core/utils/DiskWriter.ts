@@ -10,7 +10,7 @@ interface ITask {
 export default class DiskWriter {
 
   public filepath: string;
-  public tasklist: ITask[];
+  public tasklist: ITask[] = [];
   public fh: fs.FileHandle;
   public downloading: boolean = false;
 

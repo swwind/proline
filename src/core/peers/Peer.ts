@@ -93,12 +93,12 @@ export default class Peer {
    * 获取文件片段，不做检查
    */
   public async queryFilePiece(cid: string, fid: string, index: number): Promise<Buffer> {
-    const result = await this.axios.get('/filepiece', { params: { cid, fid, index } });
+    const result = await this.axios.get('/filepiece', { params: { cid, fid, index }, responseType: 'arraybuffer' });
 
     if (result.status === 200) {
       return result.data;
     }
-    throw new Error(result.data);
+    throw new Error(result.data.toString());
 
   }
 

@@ -233,11 +233,15 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
     if (finished(cid, fid)) {
       return;
     }
+    log.log(`Recieved Hash: ${md5(buffer).slice(0, 16)} | ${fileinfo.pieces[piece]}`);
     if (md5(buffer).slice(0, 16) !== fileinfo.pieces[piece]) {
       throw new Error(`Piece failed hash check: ${cid}/${fid}[${piece}]`);
     }
     log.log(`Downloading piece ${piece} success`);
     await dw.write(buffer, fileinfo.psize * piece);
+    const oldpiecestate = sgetPieceStatus(cid, fid) as boolean[];
+    oldpiecestate[piece] = true;
+    ssetPieceStatus(cid, fid, oldpiecestate);
   } catch (e) {
     log.error(`Error while downloading piece ${cid}/${fid}[${piece}]: ${e.message}`);
   }
