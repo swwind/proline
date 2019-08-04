@@ -153,7 +153,7 @@ const listenSocket = () => {
         ipset.delete(localip);
         Peers.updatePeers('SERVER', Array.from(ipset));
         setTimeout(() => {
-          socket.write(Buffer.from('d3880400', 'hex'));
+          socket.write(Buffer.from('d3080400', 'hex'));
         }, 15000);
         break;
       }

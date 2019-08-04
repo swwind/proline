@@ -1,11 +1,11 @@
 import * as Koa from 'koa';
 import * as Router from 'koa-router';
 import * as mount from 'koa-mount';
-import * as logger from 'koa-logger';
 import * as bodyRouter from 'koa-bodyparser';
 import * as Posts from '../posts/Posts';
 import * as Channels from '../posts/Channels';
 import * as Files from '../posts/Files';
+import { log } from 'electron-log';
 
 const api = new Koa();
 const router = new Router();
@@ -139,7 +139,10 @@ api.use(router.routes());
 api.use(router.allowedMethods());
 
 const app = new Koa();
-app.use(logger());
+app.use(async (ctx, next) => {
+  log(ctx.URL);
+  await next();
+});
 app.use(mount('/api/v1', api));
 
 app.listen(25468);

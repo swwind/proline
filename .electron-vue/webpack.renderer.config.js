@@ -104,6 +104,12 @@ module.exports = (env, argv) => {
           ? path.resolve(__dirname, '../node_modules')
           : false
       }),
+      new CopyWebpackPlugin([
+        {
+          from: path.join(__dirname, '../static'),
+          to: path.join(__dirname, '../dist/static')
+        }
+      ]),
     ],
     output: {
       filename: '[name].js',
@@ -122,16 +128,7 @@ module.exports = (env, argv) => {
   /**
    * Adjust rendererConfig for development settings
    */
-  if (argv.mode === 'production') {
-    rendererConfig.plugins.push(
-      new CopyWebpackPlugin([
-        {
-          from: path.join(__dirname, '../static'),
-          to: path.join(__dirname, '../dist/static')
-        }
-      ])
-    );
-  } else {
+  if (argv.mode !== 'production') {
     rendererConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
   }
 
