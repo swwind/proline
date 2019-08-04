@@ -11,12 +11,12 @@ A decentrialized post subscriber and file downloader.
 ## TODO
 
 - [x] drag and drop files
-- [ ] file sharing
-- [ ] file downloading
+- [x] file sharing
+- [x] file downloading
 - [x] post publishing
 - [ ] mime and protocol
 - [x] dark mode
-- [ ] p2p instant message
+- [ ] ~~p2p instant message~~
 
 ## Development
 

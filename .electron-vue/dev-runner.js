@@ -76,13 +76,11 @@ const startBackend = (title, config) => {
       logStats(title, stats)
 
       if (electronProcess && electronProcess.kill) {
-        manualRestart = true
-        process.kill(electronProcess.pid)
-        electronProcess = null
-        startElectron()
+        manualRestart = true;
+        electronProcess.kill('SIGINT');
 
         setTimeout(() => {
-          manualRestart = false
+          manualRestart = false;
         }, 5000)
       }
 
@@ -95,27 +93,31 @@ const startElectron = () => {
   var args = [
     '--inspect=5858',
     path.join(__dirname, '../dist/main.js')
-  ]
+  ];
 
   // detect yarn or npm and process commandline args accordingly
   if (process.env.npm_execpath.endsWith('yarn.js')) {
-    args = args.concat(process.argv.slice(3))
+    args = args.concat(process.argv.slice(3));
   } else if (process.env.npm_execpath.endsWith('npm-cli.js')) {
-    args = args.concat(process.argv.slice(2))
+    args = args.concat(process.argv.slice(2));
   }
 
-  electronProcess = spawn(electron, args)
+  electronProcess = spawn(electron, args);
   
   electronProcess.stdout.on('data', (data) => {
     console.log(data.toString().trim());
-  })
+  });
   electronProcess.stderr.on('data', (data) => {
     console.error(data.toString().trim());
-  })
+  });
 
   electronProcess.on('close', () => {
-    if (!manualRestart) process.exit()
-  })
+    if (!manualRestart) {
+      process.exit();
+    } else {
+      startElectron();
+    }
+  });
 }
 
 const init = async () => {
@@ -133,5 +135,7 @@ init();
 process.on('SIGINT', () => {
   if (electronProcess && !electronProcess.killed) {
     electronProcess.kill('SIGINT');
+  } else {
+    process.exit();
   }
 });

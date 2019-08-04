@@ -36,7 +36,7 @@
     },
     "win": {
       "target": "squirrel",
-      "icon": "build/icon.ico"
+      "icon": "dist/icon/icon.ico"
     },
     "electronDownload": {
       "mirror": "https://npm.taobao.org/mirrors/electron/"
