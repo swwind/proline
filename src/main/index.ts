@@ -1,14 +1,13 @@
+/* eslint-disable */
 
 import { BrowserWindow, app, Menu, Tray, ipcMain, shell } from 'electron';
 import path from 'path';
 import { log } from 'electron-log';
 
-// import { IMain } from '../types';
-// /* eslint-disable-next-line */
-// declare const __non_webpack_require__: Function;
-// const main: IMain = __non_webpack_require__('./core').default;
-// const { server } = main;
-
+import { IMain } from '../types';
+/* eslint-disable-next-line */
+declare const __non_webpack_require__: Function;
+const main: IMain = __non_webpack_require__('./core').default;
 
 let mainWindow: BrowserWindow | null;
 let tray: Tray | null;
@@ -77,7 +76,7 @@ const createWindow = () => {
       }
     }],
   }]);
-  mainWindow.setMenu(menu);
+  // mainWindow.setMenu(menu);
 
   tray = new Tray(path.resolve(
     __dirname,
