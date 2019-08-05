@@ -197,7 +197,7 @@ export const getFilePath = (cid: string, fid: string) => {
 const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
   const status = sgetPieceStatus(cid, fid);
   const fileinfo = sgetFileInfo(cid, fid);
-  if (status === true) {
+  if (status === true || !downloadSet.has(cid + fid)) {
     // finished
     return;
   }
@@ -285,6 +285,9 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
 
 };
 
+/**
+ * 继续下载
+ */
 export const continueDownload = async (cid: string, fid: string) => {
   const filepath = sgetFilePath(cid, fid);
   const fileinfo = sgetFileInfo(cid, fid);
@@ -303,6 +306,12 @@ export const continueDownload = async (cid: string, fid: string) => {
 
 };
 
+/**
+ * 暂停下载
+ */
+export const pauseDownload = async (cid: string, fid: string) => {
+  downloadSet.delete(cid + fid);
+};
 
 /**
  * 解析文件作为种子，没有签名

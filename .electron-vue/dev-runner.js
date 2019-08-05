@@ -46,9 +46,7 @@ const startRenderer = () => {
           ctx.middleware.waitUntilValid(() => {
             resolve()
           })
-        },
-        hot: false,
-        inline: false,
+        }
       }
     )
 

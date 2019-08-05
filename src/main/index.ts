@@ -1,13 +1,11 @@
-/* eslint-disable */
 
 import { BrowserWindow, app, Menu, Tray, ipcMain, shell } from 'electron';
 import path from 'path';
 import { log } from 'electron-log';
 
-import { IMain } from '../types';
 /* eslint-disable-next-line */
 declare const __non_webpack_require__: Function;
-const main: IMain = __non_webpack_require__('./core').default;
+__non_webpack_require__('./core');
 
 let mainWindow: BrowserWindow | null;
 let tray: Tray | null;
@@ -66,6 +64,7 @@ const createWindow = () => {
     submenu: [{
       label: 'Quit',
       accelerator: 'Ctrl+Q',
+      click: doExit,
     }],
   }, {
     label: 'Help',
@@ -74,9 +73,17 @@ const createWindow = () => {
       click() {
         shell.openExternal('https://github.com/swwind/proline');
       }
+    }, {
+      label: 'Open Devtools',
+      accelerator: 'Ctrl+Shift+I',
+      click() {
+        if (mainWindow) {
+          mainWindow.webContents.openDevTools();
+        }
+      }
     }],
   }]);
-  // mainWindow.setMenu(menu);
+  mainWindow.setMenu(menu);
 
   tray = new Tray(path.resolve(
     __dirname,
@@ -113,3 +120,5 @@ app.on('activate', () => {
 });
 
 ipcMain.on('exit', doExit);
+
+process.on('SIGINT', doExit);

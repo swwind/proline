@@ -16,7 +16,7 @@ export default class DiskWriter {
 
   public async open(filepath: string, filesize: number) {
     this.filepath = filepath;
-    this.fh = await fs.open(filepath, 'a');
+    this.fh = await fs.open(filepath, 'r+');
     // 调整大小，不会删除现有的
     await this.fh.truncate(filesize);
   }

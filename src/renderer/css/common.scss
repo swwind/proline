@@ -1,0 +1,187 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'WenQuanYi Micro Hei', 'WenQuanYi Zen Hei', 'Microsoft Yahei', sans-serif;
+  user-select: none;
+}
+
+h1, h2, h3, .h1, .h2, .h3 {
+  font-weight: normal;
+}
+h1, .h1 {
+  font-size: 36px;
+}
+h2, .h2 {
+  font-size: 30px;
+}
+h3, .h3 {
+  font-size: 24px;
+}
+
+.list {
+  margin: 50px 0;
+
+  .nothing, .loading {
+    text-align: center;
+    color: var(--level-2-color);
+  }
+
+  .item {
+    display: block;
+    color: var(--main-color);
+    text-decoration: none;
+    padding: 20px;
+    transition: background-color .2s;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 5px;
+    border-radius: 5px;
+
+    &:hover {
+      background-color: var(--level-3-color);
+    }
+  }
+
+  .right {
+    float: right;
+  }
+}
+
+button, .real-button, .radius-button, .select {
+  background-color: var(--level-3-color);
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 2px solid var(--level-3-color);
+  outline: none;
+  display: inline-block;
+  transition: all .3s, transform .1s;
+  cursor: pointer;
+  font-size: 18px;
+  margin: 10px 20px 10px 0;
+  text-decoration: none;
+  color: var(--main-color);
+
+  &:hover {
+    color: var(--main-color);
+    background-color: var(--background-color);
+    border: 2px solid var(--theme-color);
+  }
+
+  &:focus {
+    border: 2px solid var(--theme-color);
+  }
+
+  &:active {
+    transform: translateY(3px);
+  }
+
+  &:disabled {
+    color: var(--disable-color);
+    border: 2px solid var(--level-3-color);
+    background-color: var(--level-3-color);
+    cursor: not-allowed;
+  }
+
+  &.green {
+    color: var(--background-color);
+    background-color: var(--green-color);
+    border-color: var(--green-color);
+
+    &:hover, &:focus {
+      background-color: var(--level-3-color);
+      color: var(--green-color);
+    }
+  }
+
+  &.red {
+    color: var(--background-color);
+    background-color: var(--red-color);
+    border-color: var(--red-color);
+
+    &:hover, &:focus {
+      background-color: var(--level-3-color);
+      color: var(--red-color);
+    }
+  }
+
+  &.green, &.red {
+    &:disabled {
+      color: var(--disable-color);
+      border: 2px solid var(--level-3-color);
+      background-color: var(--level-3-color);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.radius-button {
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.input-text {
+  display: block;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid var(--level-3-color);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0;
+  transition: all .3s;
+  background-color: var(--background-color);
+  color: var(--main-color);
+
+  &:hover {
+    border-color: var(--level-1-color);
+  }
+
+  &:focus {
+    border-color: var(--theme-color);
+  }
+}
+
+.input-checkbox {
+  all: unset;
+  display: inline-block;
+  background-color: var(--level-3-color);
+  width: 50px;
+  height: 20px;
+  border-radius: 20px;
+  position: relative;
+  transition: all .3s;
+  cursor: pointer;
+  vertical-align: middle;
+
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    background-color: var(--level-1-color);
+    border-radius: 20px;
+    top: -2.5px;
+    left: -2.5px;
+    transition: all .2s;
+  }
+
+  &:checked {
+    background-color: var(--dark-green-color);
+
+    &::after {
+      left: 27.5px;
+      background-color: var(--green-color);
+    }
+  }
+}
+
+.setsumei {
+  margin: 20px 0;
+  font-size: 18px;
+}
+.small-setsumei {
+  margin: 20px 0 10px;
+  font-size: 18px;
+}

@@ -43,6 +43,10 @@
             {{ progress }} / {{ file.pieces.length }}
           </div>
         </div>
+        <button @click="pauseDownload()">
+          <i class="icon">pause</i>
+          Pause
+        </button>
       </div>
       <div v-if="state === 'FINISHED'">
         <video
@@ -57,10 +61,11 @@
           class="image"
           :src="`file://${filepath}`"
         >
-        <button
-          v-if="state === 'FINISHED'"
-          @click="openFile()"
-        >
+        <button @click="openFile()">
+          <i class="icon">open_in_new</i>
+          Open file
+        </button>
+        <button @click="viewFile()">
           <i class="icon">open_in_new</i>
           View in File Manager
         </button>
@@ -152,6 +157,9 @@ export default Vue.extend({
   },
   methods: {
     openFile() {
+      shell.openItem(this.filepath);
+    },
+    viewFile() {
       shell.showItemInFolder(this.filepath);
     },
     chooseFolder() {
@@ -165,11 +173,16 @@ export default Vue.extend({
     },
     startDownload() {
       Files.startDownload(this.cid, this.fid, this.folder);
+      this.filepath = Files.getFilePath(this.cid, this.fid) || '';
       this.state = 'DOWNLOADING';
     },
     continueDownload() {
       Files.continueDownload(this.cid, this.fid);
       this.state = 'DOWNLOADING';
+    },
+    pauseDownload() {
+      Files.pauseDownload(this.cid, this.fid);
+      this.state = 'PAUSED';
     }
   }
 });

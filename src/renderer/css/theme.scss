@@ -29,4 +29,21 @@
   --green-color: #03dac5;
   --dark-green-color: #079587;
   --red-color: #ca3e47;
+
+  ::-webkit-scrollbar {
+    background-color: #1c1e1f;
+    color: #c5c1b9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #2a2c2e;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #323537;
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background-color: #3d4043;
+  }
+  ::-webkit-scrollbar-corner {
+    background-color: #181a1b;
+  }
 }
