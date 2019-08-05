@@ -276,12 +276,15 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
   await dw.open(savepath, fileinfo.size);
 
   const prs = await Peers.haveFile(cid, fid);
-  prs.forEach((pr) => download(cid, fid, pr, dw));
-
-  // TODO: flush peer
 
   log.log(`${prs.length} peers is working...`);
-  downloadSet.add(cid + fid);
+
+  if (prs.length) {
+    downloadSet.add(cid + fid);
+    prs.forEach((pr) => download(cid, fid, pr, dw));
+  } else {
+    dw.close();
+  }
 
 };
 
@@ -299,10 +302,15 @@ export const continueDownload = async (cid: string, fid: string) => {
   const dw = new DiskWriter();
   await dw.open(filepath, fileinfo.size);
   const prs = await Peers.haveFile(cid, fid);
-  prs.forEach((pr) => download(cid, fid, pr, dw));
 
-  log.log(`${prs.length} peers is continued...`);
-  downloadSet.add(cid + fid);
+  log.log(`${prs.length} peers is working...`);
+
+  if (prs.length) {
+    downloadSet.add(cid + fid);
+    prs.forEach((pr) => download(cid, fid, pr, dw));
+  } else {
+    dw.close();
+  }
 
 };
 
