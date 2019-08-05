@@ -14,10 +14,10 @@ const winURL = process.env.NODE_ENV !== 'production'
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`;
 
-const doExit = () => {
+const doExit = async () => {
   exit = true;
   if (mainWindow) {
-    mainWindow.close();
+    mainWindow.webContents.send('exit');
   }
 };
 
@@ -47,7 +47,7 @@ const createWindow = () => {
 
   mainWindow.on('close', (e) => {
     if (!exit) {
-      log('[MAIN] Window closed, but I don\'t want to be killed');
+      log('[MAIN] Window not closed');
       e.preventDefault();
       if (mainWindow) {
         mainWindow.hide();
@@ -56,6 +56,7 @@ const createWindow = () => {
   });
 
   mainWindow.on('closed', () => {
+    log('[MAIN] Window really closed');
     mainWindow = null;
   });
 
@@ -120,5 +121,12 @@ app.on('activate', () => {
 });
 
 ipcMain.on('exit', doExit);
+ipcMain.on('finish-exit', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  } else {
+    process.exit(0);
+  }
+});
 
 process.on('SIGINT', doExit);

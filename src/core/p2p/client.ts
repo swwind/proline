@@ -9,7 +9,7 @@ export default (address: string, port: number) => {
 
   const axs = axios.create({
     baseURL,
-    timeout: 2000,
+    timeout: 4000,
     maxRedirects: 0,
     validateStatus: () => true,
   });

@@ -113,31 +113,10 @@ export default Vue.extend({
     this.file = fileinfo;
     const filestate = await Files.getFileStatus(this.cid, this.fid);
     this.state = filestate;
-
-    if (filestate !== 'NOTSTARTED') {
+    if (this.state !== 'NOTSTARTED') {
       this.filepath = Files.getFilePath(this.cid, this.fid) || '';
     }
-
-    if (filestate === 'FINISHED') {
-      if ((/\.mp4$/i).test(fileinfo.filename)) {
-        this.videourl = `file://${this.filepath}`;
-      }
-      if ((/\.flv$/i).test(fileinfo.filename)) {
-        this.videourl = true;
-        setTimeout(() => {
-          const videoElement = document.getElementById('video') as HTMLVideoElement;
-          const flv = flvjs.createPlayer({
-            type: 'flv',
-            url: `file://${this.filepath}`,
-          });
-          flv.attachMediaElement(videoElement);
-          flv.load();
-        }, 0);
-      }
-      if ((/\.(jpe?g|png|gif)$/i).test(fileinfo.filename)) {
-        this.imageurl = true;
-      }
-    }
+    this.updateFinish();
 
     this.intervalid = setInterval(async () => {
       if (this.state === 'DOWNLOADING') {
@@ -145,6 +124,7 @@ export default Vue.extend({
 
         if (this.file && this.progress === this.file.pieces.length) {
           this.state = 'FINISHED';
+          this.updateFinish();
         }
       }
     }, 1000);
@@ -156,6 +136,28 @@ export default Vue.extend({
     }
   },
   methods: {
+    updateFinish() {
+      if (this.state === 'FINISHED' && this.file) {
+        if ((/\.mp4$/i).test(this.file.filename)) {
+          this.videourl = `file://${this.filepath}`;
+        }
+        if ((/\.flv$/i).test(this.file.filename)) {
+          this.videourl = true;
+          setTimeout(() => {
+            const videoElement = document.getElementById('video') as HTMLVideoElement;
+            const flv = flvjs.createPlayer({
+              type: 'flv',
+              url: `file://${this.filepath}`,
+            });
+            flv.attachMediaElement(videoElement);
+            flv.load();
+          }, 0);
+        }
+        if ((/\.(jpe?g|png|gif)$/i).test(this.file.filename)) {
+          this.imageurl = true;
+        }
+      }
+    },
     openFile() {
       shell.openItem(this.filepath);
     },

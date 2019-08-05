@@ -70,7 +70,7 @@ export default Vue.extend({
           throw new Error('Channel Already Subscribed');
         }
         await Channels.subscribe(cid, cname);
-        window.location.href = `/#/chan/${cid}`;
+        this.$router.push({ path: `/chan/${cid}` });
       } catch (e) {
         this.error = e.message;
         this.disable = false;

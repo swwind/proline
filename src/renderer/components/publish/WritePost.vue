@@ -208,7 +208,7 @@ export default Vue.extend({
         await Posts.addPost(cid, postinfo);
 
         // 跳转到文章页面
-        window.location.href = `/#/post/${cid}/${pid}`;
+        this.$router.push({ path: `/post/${cid}/${pid}` });
       } catch (e) {
         this.perror = e.message;
         this.waiting = false;

@@ -65,7 +65,7 @@ export default Vue.extend({
         await Channels.registerPrivateKey(this.cid, Encrypt.key2string(this.keypair.privateKey));
         await Channels.subscribe(this.cid, this.cname);
 
-        window.location.href = `/#/chan/${this.cid}`;
+        this.$router.push({ path: `/chan/${this.cid}` });
       } catch (e) {
         this.error = e.toString();
       }

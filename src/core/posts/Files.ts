@@ -7,7 +7,7 @@ import * as R from 'ramda';
 import { IFileInfo, RequestType, FileStatus } from '../../types';
 import * as Peers from '../peers/Peers';
 import * as Channels from './Channels';
-import { verifySignature, md5, randomBuffer, filePieceHash, string2pubkey } from '../../encrypt';
+import { verifySignature, randomBuffer, filePieceHash, string2pubkey } from '../../encrypt';
 import DiskWriter from '../utils/DiskWriter';
 import Peer from '../peers/Peer';
 import log from 'electron-log';
@@ -21,7 +21,7 @@ const store = new Store('proline-files', {
 /**
  * 保存正在下载的文件列表
  */
-const downloadSet = new Set<string>();
+const downloadMap = new Map<string, DiskWriter>();
 
 const sgetPieceStatus = (cid: string, fid: string): boolean[] | true | undefined => {
   return store.get(`pieces.${cid}.${fid}`);
@@ -123,7 +123,7 @@ export const getFileStatus = async (cid: string, fid: string): Promise<FileStatu
   if (finished(cid, fid) && await hasFile(cid, fid)) {
     return 'FINISHED';
   }
-  if (downloadSet.has(cid + fid)) {
+  if (downloadMap.has(cid + fid)) {
     return 'DOWNLOADING';
   }
   if (started(cid, fid)) {
@@ -180,6 +180,7 @@ export const getFilePiece = async (cid: string, fid: string, index: number) => {
     : fileinfo.psize;
   const buffer = Buffer.alloc(length);
   await fh.read(buffer, 0, length, fileinfo.psize * index);
+  await fh.close();
 
   return buffer;
 };
@@ -194,11 +195,10 @@ export const getFilePath = (cid: string, fid: string) => {
 /**
  * 对某个 Peer 进行下载
  */
-const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
+const download = async (cid: string, fid: string, pr: Peer) => {
   const status = sgetPieceStatus(cid, fid);
   const fileinfo = sgetFileInfo(cid, fid);
-  if (status === true || !downloadSet.has(cid + fid)) {
-    // finished
+  if (status === true || !downloadMap.has(cid + fid)) {
     return;
   }
 
@@ -217,8 +217,11 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
   if (!lack.length) {
     // 这里判断 finish 事件
     ssetPieceStatus(cid, fid, true);
-    downloadSet.delete(cid + fid);
-    await dw.close();
+    const dw = downloadMap.get(cid + fid);
+    if (dw) {
+      await dw.close();
+      downloadMap.delete(cid + fid);
+    }
 
     return;
   }
@@ -226,28 +229,30 @@ const download = async (cid: string, fid: string, pr: Peer, dw: DiskWriter) => {
   // 下载
   const piece = lack[Math.floor(Math.random() * lack.length)];
   try {
-    log.log(`Lack ${lack.length} pieces`);
     log.log(`Downloading piece ${piece} from ${pr.address}`);
 
     const buffer = await pr.queryFilePiece(cid, fid, piece);
     if (finished(cid, fid)) {
       return;
     }
-    log.log(`Recieved Hash: ${md5(buffer).slice(0, 16)} | ${fileinfo.pieces[piece]}`);
-    if (md5(buffer).slice(0, 16) !== fileinfo.pieces[piece]) {
+    if (filePieceHash(buffer) !== fileinfo.pieces[piece]) {
       throw new Error(`Piece failed hash check: ${cid}/${fid}[${piece}]`);
     }
-    log.log(`Downloading piece ${piece} success`);
+    const dw = downloadMap.get(cid + fid);
+    if (!dw) {
+      // task finished
+      return;
+    }
     await dw.write(buffer, fileinfo.psize * piece);
     const oldpiecestate = sgetPieceStatus(cid, fid) as boolean[];
     oldpiecestate[piece] = true;
     ssetPieceStatus(cid, fid, oldpiecestate);
   } catch (e) {
-    log.error(`Error while downloading piece ${cid}/${fid}[${piece}]: ${e.message}`);
+    log.error(`Error while downloading piece ${cid}/${fid}[${piece}]`);
+    log.error(e);
   }
 
-  download(cid, fid, pr, dw);
-
+  download(cid, fid, pr);
 };
 
 /**
@@ -280,10 +285,10 @@ export const startDownload = async (cid: string, fid: string, savedir: string) =
   log.log(`${prs.length} peers is working...`);
 
   if (prs.length) {
-    downloadSet.add(cid + fid);
-    prs.forEach((pr) => download(cid, fid, pr, dw));
+    downloadMap.set(cid + fid, dw);
+    prs.forEach((pr) => download(cid, fid, pr));
   } else {
-    dw.close();
+    await dw.close();
   }
 
 };
@@ -306,10 +311,10 @@ export const continueDownload = async (cid: string, fid: string) => {
   log.log(`${prs.length} peers is working...`);
 
   if (prs.length) {
-    downloadSet.add(cid + fid);
-    prs.forEach((pr) => download(cid, fid, pr, dw));
+    downloadMap.set(cid + fid, dw);
+    prs.forEach((pr) => download(cid, fid, pr));
   } else {
-    dw.close();
+    await dw.close();
   }
 
 };
@@ -318,7 +323,21 @@ export const continueDownload = async (cid: string, fid: string) => {
  * 暂停下载
  */
 export const pauseDownload = async (cid: string, fid: string) => {
-  downloadSet.delete(cid + fid);
+  const dw = downloadMap.get(cid + fid);
+  if (dw) {
+    await dw.close();
+    downloadMap.delete(cid + fid);
+  }
+};
+
+/**
+ * 暂停下载
+ */
+export const pauseAllDownloads = async () => {
+  for (const dw of downloadMap.values()) {
+    await dw.close();
+  }
+  downloadMap.clear();
 };
 
 /**
@@ -339,11 +358,20 @@ export const parseFile = async (filepath): Promise<IFileInfo> => {
 
   // 计算每一段的 hash
   const length = Math.floor((size - 1) / psize) + 1;
-  const filebuffer = await fs.readFile(filepath);
-  const pieces = await Promise.all(new Array(length).fill(0)
-    .map(async (_, index) => {
-      return filePieceHash(filebuffer.slice(index * psize, (index + 1) * psize));
-    }));
+  const pieces = new Array(length);
+  const fh = await fs.open(filepath, 'r');
+  const fileBuffer = Buffer.alloc(psize);
+
+  for (let index = 0; index < length - 1; ++index) {
+    await fh.read(fileBuffer, 0, psize, psize * index);
+    pieces[index] = filePieceHash(fileBuffer);
+  }
+  const lastlen = size - (length - 1) * psize;
+  const lastBuffer = Buffer.alloc(lastlen);
+  await fh.read(lastBuffer, 0, lastlen, (length - 1) * psize);
+  pieces[length - 1] = filePieceHash(lastBuffer);
+
+  await fh.close();
 
   return {
     fid,

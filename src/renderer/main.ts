@@ -5,7 +5,8 @@ import router from './router';
 import VueElectron from 'vue-electron';
 
 import { main } from './backend';
-const { Config, Peers } = main;
+import { ipcRenderer } from 'electron';
+const { Config, Peers, Files } = main;
 
 Vue.use(VueElectron);
 
@@ -24,3 +25,8 @@ const updateSettingPeers = (config) => {
 };
 Config.handleUpdate(updateSettingPeers);
 updateSettingPeers(Config.getConfig());
+
+ipcRenderer.on('exit', async () => {
+  await Files.pauseAllDownloads();
+  ipcRenderer.send('finish-exit');
+});
