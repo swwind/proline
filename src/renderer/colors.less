@@ -1,0 +1,51 @@
+.generate (
+  @main-color: #0084ff;
+  @back-color: white;
+  @fore-color: black;
+) {
+
+  --main-color: @main-color;
+  --back-color: @back-color;
+  --fore-color: @fore-color;
+
+  --main-color-darken-80: mix(@main-color, black, 80%);
+  --main-color-darken-60: mix(@main-color, black, 60%);
+  --main-color-darken-40: mix(@main-color, black, 40%);
+  --main-color-darken-20: mix(@main-color, black, 20%);
+
+  --back-color-darken-80: mix(@back-color, black, 80%);
+  --back-color-darken-60: mix(@back-color, black, 60%);
+  --back-color-darken-40: mix(@back-color, black, 40%);
+  --back-color-darken-20: mix(@back-color, black, 20%);
+
+  --fore-color-darken-80: mix(@fore-color, black, 80%);
+  --fore-color-darken-60: mix(@fore-color, black, 60%);
+  --fore-color-darken-40: mix(@fore-color, black, 40%);
+  --fore-color-darken-20: mix(@fore-color, black, 20%);
+
+  --main-color-lighten-80: mix(@main-color, white, 80%);
+  --main-color-lighten-60: mix(@main-color, white, 60%);
+  --main-color-lighten-40: mix(@main-color, white, 40%);
+  --main-color-lighten-20: mix(@main-color, white, 20%);
+
+  --back-color-lighten-80: mix(@back-color, white, 80%);
+  --back-color-lighten-60: mix(@back-color, white, 60%);
+  --back-color-lighten-40: mix(@back-color, white, 40%);
+  --back-color-lighten-20: mix(@back-color, white, 20%);
+
+  --fore-color-lighten-80: mix(@fore-color, white, 80%);
+  --fore-color-lighten-60: mix(@fore-color, white, 60%);
+  --fore-color-lighten-40: mix(@fore-color, white, 40%);
+  --fore-color-lighten-20: mix(@fore-color, white, 20%);
+
+}
+
+:root {
+  .generate(#0084ff, white, black);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    .generate(#0084ff, #181c27, white);
+  }
+}
