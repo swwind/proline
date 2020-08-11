@@ -2,7 +2,8 @@
   <div class="under-construction">
     <div class="content">
       <p class="building">This feature is still under construction...</p>
-      <p class="back" @click="handleBack">back</p>
+      <button class="back" @click="handleBack">back</button>
+      <button class="back focus" @click="handleBack">go damn</button>
     </div>
   </div>
 </template>

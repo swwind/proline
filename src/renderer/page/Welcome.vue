@@ -24,7 +24,7 @@ export default {
   animation: welcome-out 1s;
   animation-delay: 1s;
   animation-fill-mode: forwards;
-  animation-timing-function: ease-out;
+  animation-timing-function: cubic-bezier(0.55, 0, 0.1, 1);
 
   .title {
     color: white;

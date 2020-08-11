@@ -37,4 +37,36 @@ html, body {
     width: 100%;
   }
 }
+
+button, .button {
+  padding: 10px 30px;
+  font-size: 1em;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  color: var(--fore-color);
+  background-color: var(--back-color-lighten-90);
+  transition: background-color .3s;
+
+  &:hover {
+    background-color: var(--back-color-lighten-80);
+  }
+
+  &:active {
+    background-color: var(--back-color-lighten-70);
+  }
+
+  &.focus {
+    background-color: var(--main-color-darken-60);
+
+    &:hover {
+      background-color: var(--main-color-darken-80);
+    }
+  }
+
+  & + & {
+    margin-left: 10px;
+  }
+}
+
 </style>
