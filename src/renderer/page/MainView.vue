@@ -4,7 +4,9 @@
       <NavBar></NavBar>
     </div>
     <div class="right">
-      <router-view></router-view>
+      <transition name="fade-up">
+        <router-view></router-view>
+      </transition>
     </div>
   </div>
 </template>

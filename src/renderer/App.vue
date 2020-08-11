@@ -12,12 +12,14 @@ export default {
 
 <style lang="less">
 @import './colors.less';
+@import './transition.less';
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
   background-color: var(--back-color);
   color: var(--fore-color);
   user-select: none;

@@ -2,6 +2,7 @@
   <div class="overview">
     Over view
     <router-link to="/">go back</router-link>
+    <router-link to="/app/whatthefuck">goto 404</router-link>
   </div>
 </template>
 

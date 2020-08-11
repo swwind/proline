@@ -9,7 +9,7 @@ export default {
   name: 'welcome',
   mounted() {
     setTimeout(() => {
-      this.$router.push('/app/overview');
+      this.$router.push('/app/index');
     }, 2000);
   }
 }

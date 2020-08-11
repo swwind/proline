@@ -2,6 +2,7 @@ import UnderConstruction from './page/UnderConstruction.vue';
 import Welcome from './page/Welcome.vue';
 import Overview from './page/Overview.vue';
 import MainView from './page/MainView.vue';
+import Index from './page/Index.vue';
 
 const routes = [
   {
@@ -14,6 +15,9 @@ const routes = [
     component: MainView,
     children: [
       {
+        path: 'index',
+        component: Index
+      }, {
         path: 'overview',
         component: Overview
       }, {
