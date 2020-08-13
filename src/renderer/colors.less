@@ -1,7 +1,7 @@
 .generate (
-  @main-color: #0084ff;
-  @back-color: white;
-  @fore-color: black;
+  @main-color;
+  @back-color;
+  @fore-color;
 ) {
 
   --main-color: @main-color;
@@ -68,6 +68,16 @@
   --fore-color-lighten-20: mix(@fore-color, white, 20%);
   --fore-color-lighten-10: mix(@fore-color, white, 10%);
 
+  --contrast-90: mix(@back-color, @fore-color, 90%);
+  --contrast-80: mix(@back-color, @fore-color, 80%);
+  --contrast-70: mix(@back-color, @fore-color, 70%);
+  --contrast-60: mix(@back-color, @fore-color, 60%);
+  --contrast-50: mix(@back-color, @fore-color, 50%);
+  --contrast-40: mix(@back-color, @fore-color, 40%);
+  --contrast-30: mix(@back-color, @fore-color, 30%);
+  --contrast-20: mix(@back-color, @fore-color, 20%);
+  --contrast-10: mix(@back-color, @fore-color, 10%);
+
 }
 
 :root {
@@ -76,6 +86,6 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    .generate(#1e88e5, #181c27, white);
+    .generate(#252d38, #181c27, white);
   }
 }

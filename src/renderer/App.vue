@@ -1,18 +1,27 @@
 <template>
   <div class="app">
-    <router-view></router-view>
+    <div class="up">
+      <router-view></router-view>
+    </div>
+    <div class="down">
+      <StatusBar></StatusBar>
+    </div>
   </div>
 </template>
 
 <script>
+import StatusBar from './page/StatusBar.vue';
+
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    StatusBar
+  }
 }
 </script>
 
 <style lang="less">
-@import './colors.less';
-@import './transition.less';
+@import './style.less';
 
 html, body {
   margin: 0;
@@ -31,42 +40,17 @@ html, body {
 .app {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 
-  > div {
-    height: 100%;
-    width: 100%;
-  }
-}
+  .up {
+    flex: 1;
 
-button, .button {
-  padding: 10px 30px;
-  font-size: 1em;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-  color: var(--fore-color);
-  background-color: var(--back-color-lighten-90);
-  transition: background-color .3s;
-
-  &:hover {
-    background-color: var(--back-color-lighten-80);
-  }
-
-  &:active {
-    background-color: var(--back-color-lighten-70);
-  }
-
-  &.focus {
-    background-color: var(--main-color-darken-60);
-
-    &:hover {
-      background-color: var(--main-color-darken-80);
+    > div {
+      height: 100%;
     }
   }
-
-  & + & {
-    margin-left: 10px;
-  }
 }
+
 
 </style>

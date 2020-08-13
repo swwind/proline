@@ -1,9 +1,10 @@
 <template>
   <div class="under-construction">
     <div class="content">
-      <p class="building">This feature is still under construction...</p>
+      <p class="text">This feature is still under construction...</p>
       <button class="back" @click="handleBack">back</button>
-      <button class="back focus" @click="handleBack">go damn</button>
+      <button class="back" @click="handleBack">back</button>
+      <button class="back" @click="handleBack">back</button>
     </div>
   </div>
 </template>
@@ -30,12 +31,8 @@ export default {
   .content {
     text-align: center;
 
-    .building {
+    .text {
       font-size: 2em;
-    }
-
-    .back {
-      cursor: pointer;
     }
   }
 }

@@ -21,12 +21,11 @@ export default {
 
 .status {
   background-color: var(--main-color-darken-80);
-  height: 100%;
+  height: 25px;
+  line-height: 25px;
   padding: 0 5px;
   font-size: 13px;
-  transform: translateY(20px);
-  animation: slide-up .3s;
-  animation-fill-mode: forwards;
+  color: white;
 
   .left {
     float: left;
@@ -45,12 +44,6 @@ export default {
     &:hover {
       background-color: var(--main-color-darken-90);
     }
-  }
-}
-
-@keyframes slide-up {
-  to {
-    transform: none;
   }
 }
 

@@ -1,15 +1,51 @@
 <template>
   <div class="navbar">
-    <div class="item">1</div>
-    <div class="item">2</div>
-    <div class="item now">3</div>
-    <div class="item">4</div>
+    <router-link
+      v-for="route in routes"
+      :key="route.path"
+      :to="route.path"
+      class="item"
+      :class="{ now: route.path === path }"
+      :title="route.title">
+      <i class="icon">{{ route.icon }}</i>
+    </router-link>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'navbar'
+  name: 'navbar',
+  data() {
+    return {
+      routes: [
+        {
+          path: '/',
+          icon: 'home',
+          title: 'Home'
+        }, {
+          path: '/app/overview',
+          icon: 'subject',
+          title: 'Overview'
+        }, {
+          path: '/app/settings',
+          icon: 'settings',
+          title: 'Settings'
+        }, {
+          path: '/app/files',
+          icon: 'folder',
+          title: 'Files'
+        }
+      ],
+      path: '/',
+    }
+  },
+  watch: {
+    $route(to, from) {
+      if (to && to.path) {
+        this.path = to.path;
+      }
+    }
+  }
 }
 </script>
 
@@ -35,7 +71,7 @@ export default {
     text-align: center;
     color: white;
     cursor: pointer;
-    counter-increment: index;
+    text-decoration: none;
 
     animation: upside-in .5s;
     animation-fill-mode: forwards;

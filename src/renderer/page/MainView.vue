@@ -1,17 +1,12 @@
 <template>
   <div class="mainview">
-    <div class="up">
-      <div class="left">
-        <NavBar></NavBar>
-      </div>
-      <div class="right">
-        <transition name="fade-up">
-          <router-view></router-view>
-        </transition>
-      </div>
+    <div class="left">
+      <NavBar></NavBar>
     </div>
-    <div class="down">
-      <StatusBar></StatusBar>
+    <div class="right">
+      <transition name="fade-up">
+        <router-view></router-view>
+      </transition>
     </div>
   </div>
 </template>
@@ -33,24 +28,15 @@ export default {
 
 .mainview {
   display: flex;
-  flex-direction: column;
-  .up {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
+  flex-direction: row;
   
-    .left {
-      width: 50px;
-    }
-  
-    .right {
-      flex: 1;
-      padding: 20px 30px;
-    }
+  .left {
+    width: 50px;
   }
-  .down {
-    height: 25px;
-    line-height: 25px;
+
+  .right {
+    flex: 1;
+    padding: 0 30px;
   }
 }
 
